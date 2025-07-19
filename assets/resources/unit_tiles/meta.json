@@ -1,0 +1,58 @@
+{
+    "idle": {
+      "frame_width": 128,
+      "frame_height": 128,
+      "directions": ["left", "leftUp", "up", "rightUp", "right", "rightDown", "down", "leftDown"],
+      "start_frame": 0,
+      "frame_count": 4,
+      "fps": 12
+    },
+    "run": {
+      "frame_width": 128,
+      "frame_height": 128,
+      "directions": ["left", "leftUp", "up", "rightUp", "right", "rightDown", "down", "leftDown"],
+      "start_frame": 4,
+      "frame_count": 8,
+      "fps": 6
+    },
+    "attack": {
+      "frame_width": 128,
+      "frame_height": 128,
+      "directions": ["left", "leftUp", "up", "rightUp", "right", "rightDown", "down", "leftDown"],
+      "start_frame": 12,
+      "frame_count": 6,
+      "fps": 7
+    },
+    "block": {
+      "frame_width": 128,
+      "frame_height": 128,
+      "directions": ["left", "leftUp", "up", "rightUp", "right", "rightDown", "down", "leftDown"],
+      "start_frame": 17,
+      "frame_count": 1,
+      "fps": 6
+    },
+    "die": {
+      "frame_width": 128,
+      "frame_height": 128,
+      "directions": ["left", "leftUp", "up", "rightUp", "right", "rightDown", "down", "leftDown"],
+      "start_frame": 18,
+      "frame_count": 6,
+      "fps": 8
+    },
+    "menace": {
+      "frame_width": 128,
+      "frame_height": 128,
+      "directions": ["left", "leftUp", "up", "rightUp", "right", "rightDown", "down", "leftDown"],
+      "start_frame": 24,
+      "frame_count": 4,
+      "fps": 6
+    },
+    "shoot": {
+      "frame_width": 128,
+      "frame_height": 128,
+      "directions": ["left", "leftUp", "up", "rightUp", "right", "rightDown", "down", "leftDown"],
+      "start_frame": 28,
+      "frame_count": 4,
+      "fps": 13
+    }
+  }
