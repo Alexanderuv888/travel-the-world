@@ -21,7 +21,8 @@
             "scaleInEditor": 1
         },
         "/Users/vols/Projects/travel-the-world/assets/levels/level_2/grass_medium_64x32.tsx": {
-            "dynamicWrapping": false
+            "dynamicWrapping": false,
+            "scaleInDock": 1
         },
         "/Users/vols/Projects/travel-the-world/assets/levels/level_2/grassland_tiles.tsx": {
             "dynamicWrapping": false,
