@@ -63,10 +63,8 @@ func (g *Game) Draw(screen *ebiten.Image) {
 
 	g.Unit.Update(screen, dq, levelDimentions, g.AssetsManager)
 
-	//dq.Add(g.Unit.CTile)
 	for _, unit := range g.CurrentLevel.units {
 		unit.Update(screen, dq, levelDimentions, g.AssetsManager)
-		//dq.Add(unit.CTile)
 	}
 
 	for _, obj := range g.CurrentLevel.objects {
