@@ -33,6 +33,12 @@ func (camera *Camera) Update() {
 	if ebiten.IsKeyPressed(ebiten.KeyArrowDown) {
 		camera.vy = +cameraSpeed
 	}
+
+	xoff, yoff := ebiten.Wheel()
+
+	camera.vx = -4 * xoff
+	camera.vy = -4 * yoff
+
 	camera.X += camera.vx
 	camera.Y += camera.vy
 }

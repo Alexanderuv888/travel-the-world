@@ -9,6 +9,21 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
+func (u *Unit) Move(objects []*tiles.ObjectTile, units []*Unit, levelDimentions image.Point, cameraPos image.Point) {
+
+	u.updateAngle(levelDimentions, cameraPos)
+	u.updateDirection()
+	iset := &common.InteractableList{}
+	for _, npc := range units {
+		iset.Add(npc)
+	}
+	u.tryMove(iset)
+
+	u.updateAction()
+
+	u.holdUnitInBorderMap(levelDimentions)
+}
+
 func (u *Unit) updateAngle(levelDimentions image.Point, cameraPos image.Point) {
 	u.vx = 0
 	u.vy = 0
@@ -28,19 +43,9 @@ func (u *Unit) updateAngle(levelDimentions image.Point, cameraPos image.Point) {
 	}
 }
 
-func (u *Unit) faceWithObjects(objects *common.InteractableList) bool {
-	for _, o := range objects.Items {
-		if u != o && u.Rect().Overlaps(o.Rect()) {
-			overlapSize := u.Centr().Sub(o.Centr())
-			u.X = float64(u.Centr().X + overlapSize.X/4)
-			u.Y = float64(u.Centr().Y + overlapSize.Y/4)
-			if u.Goal().In(o.Rect()) {
-				u.stopUnit()
-			}
-			return true
-		}
-	}
-	return false
+func (u *Unit) countSpeed() {
+	u.vx = speed * math.Sin(u.Angle)
+	u.vy = speed * math.Cos(u.Angle)
 }
 
 func (u *Unit) updateDirection() {
@@ -66,25 +71,24 @@ func (u *Unit) updateDirection() {
 	}
 }
 
-func (u *Unit) countSpeed() {
-	u.vx = speed * math.Sin(u.Angle)
-	u.vy = speed * math.Cos(u.Angle)
-}
-
-func (u *Unit) Move(objects []*tiles.ObjectTile, units []*Unit, levelDimentions image.Point, cameraPos image.Point) {
-
-	u.updateAngle(levelDimentions, cameraPos)
-	u.updateDirection()
-	iset := &common.InteractableList{}
-	for _, npc := range units {
-		iset.Add(npc)
+func (u *Unit) tryMove(objects *common.InteractableList) {
+	u.X += u.vx
+	u.Y += u.vy
+	if objects != nil && u.faceWithObjects(objects) {
+		u.X -= u.vx
 	}
-	u.tryMove(iset)
-
-	u.updateAction()
-
-	u.holdUnitInBorderMap(levelDimentions)
+	if objects != nil && u.faceWithObjects(objects) {
+		u.Y -= u.vy
+	}
 }
+
+func (u *Unit) stopUnit() {
+	u.GoalX = float64(u.X)
+	u.GoalY = float64(u.Y)
+	u.vx = 0
+	u.vy = 0
+}
+
 func (u *Unit) holdUnitInBorderMap(levelDimentions image.Point) {
 	// Не выходим за границы карты
 
