@@ -6,24 +6,24 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
-func (u *Unit) updateAction() {
+func (u *Unit) updateAnamation() {
 	if ebiten.IsKeyPressed(ebiten.KeyA) {
 		u.stopUnit()
-		u.SetAction(ActionAttack)
+		u.setAnimation(ActionAttack)
 	} else if ebiten.IsKeyPressed(ebiten.KeyS) {
 		u.stopUnit()
-		u.SetAction(ActionShoot)
+		u.setAnimation(ActionShoot)
 	} else if ebiten.IsKeyPressed(ebiten.KeyD) {
 		u.stopUnit()
-		u.SetAction(ActionDie)
+		u.setAnimation(ActionDie)
 	} else if u.vx == 0 || u.vy == 0 {
-		u.SetAction(ActionIdle)
+		u.setAnimation(ActionIdle)
 	} else {
-		u.SetAction(ActionRun)
+		u.setAnimation(ActionRun)
 	}
 }
 
-func (u *Unit) SetAction(newAction assets.Action) {
+func (u *Unit) setAnimation(newAction assets.Action) {
 	if u.Action != newAction {
 		u.current = 0
 		u.Action = newAction

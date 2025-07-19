@@ -19,7 +19,7 @@ func (u *Unit) Move(objects []*tiles.ObjectTile, units []*Unit, levelDimentions 
 	}
 	u.tryMove(iset)
 
-	u.updateAction()
+	u.updateAnamation()
 
 	u.holdUnitInBorderMap(levelDimentions)
 }
