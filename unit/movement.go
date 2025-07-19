@@ -19,7 +19,7 @@ func (u *Unit) Move(objects []*tiles.ObjectTile, units []*Unit, levelDimentions 
 	}
 	u.tryMove(iset)
 
-	u.updateAnamation()
+	u.updateAnamationType()
 
 	u.holdUnitInBorderMap(levelDimentions)
 }
@@ -51,23 +51,23 @@ func (u *Unit) countSpeed() {
 func (u *Unit) updateDirection() {
 	switch {
 	case 2.8 <= u.Angle || u.Angle <= -2.8:
-		u.direction = DirUp
+		u.animation.direction = DirUp
 	case 1.7 <= u.Angle && u.Angle < 2.8:
-		u.direction = DirRightUp
+		u.animation.direction = DirRightUp
 	case 1.3 <= u.Angle && u.Angle < 1.7:
-		u.direction = DirRight
+		u.animation.direction = DirRight
 	case 0.3 <= u.Angle && u.Angle < 1.3:
-		u.direction = DirRightDown
+		u.animation.direction = DirRightDown
 	case 0.3 > u.Angle && u.Angle > -0.3:
-		u.direction = DirDown
+		u.animation.direction = DirDown
 	case -0.3 >= u.Angle && u.Angle > -1.3:
-		u.direction = DirLeftDown
+		u.animation.direction = DirLeftDown
 	case -1.3 >= u.Angle && u.Angle > -1.7:
-		u.direction = DirLeft
+		u.animation.direction = DirLeft
 	case -1.7 >= u.Angle && u.Angle > -2.8:
-		u.direction = DirLeftUp
+		u.animation.direction = DirLeftUp
 	default:
-		u.direction = DirLeft
+		u.animation.direction = DirLeft
 	}
 }
 
