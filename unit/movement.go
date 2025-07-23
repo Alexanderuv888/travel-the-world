@@ -4,40 +4,23 @@ import (
 	"image"
 	"math"
 	"travel-the-world/common"
-	"travel-the-world/tiles"
-
-	"github.com/hajimehoshi/ebiten/v2"
 )
 
-func (u *Unit) Move(objects []*tiles.ObjectTile, units []*Unit, levelDimentions image.Point, cameraPos image.Point) {
+func (u *Unit) Move(iset *common.InteractableList, levelDimentions image.Point) {
 
-	u.updateAngle(levelDimentions, cameraPos)
+	u.updateAngle()
 	u.updateDirection()
-	iset := &common.InteractableList{}
-	for _, npc := range units {
-		iset.Add(npc)
-	}
 	u.tryMove(iset)
-
-	u.updateAnamationType()
 
 	u.holdUnitInBorderMap(levelDimentions)
 }
 
-func (u *Unit) updateAngle(levelDimentions image.Point, cameraPos image.Point) {
+func (u *Unit) updateAngle() {
 	u.vx = 0
 	u.vy = 0
 
-	if ebiten.IsMouseButtonPressed(ebiten.MouseButton0) {
-		GoalX, GoalY := ebiten.CursorPosition()
-		u.GoalX = float64(GoalX + cameraPos.X)
-		u.GoalY = float64(GoalY + cameraPos.Y)
-	}
-
-	if u.Goal().In(u.Rect()) {
-		u.stopUnit()
-	} else {
-		goalVector := image.Rectangle{u.Centr(), u.Goal()}
+	if u.target != nil {
+		goalVector := image.Rectangle{u.Point(), u.target.Point()}
 		u.Angle = math.Atan2(float64(goalVector.Dx()), float64(goalVector.Dy()))
 		u.countSpeed()
 	}
@@ -51,23 +34,23 @@ func (u *Unit) countSpeed() {
 func (u *Unit) updateDirection() {
 	switch {
 	case 2.8 <= u.Angle || u.Angle <= -2.8:
-		u.animation.direction = DirUp
+		u.action.animation.direction = DirUp
 	case 1.7 <= u.Angle && u.Angle < 2.8:
-		u.animation.direction = DirRightUp
+		u.action.animation.direction = DirRightUp
 	case 1.3 <= u.Angle && u.Angle < 1.7:
-		u.animation.direction = DirRight
+		u.action.animation.direction = DirRight
 	case 0.3 <= u.Angle && u.Angle < 1.3:
-		u.animation.direction = DirRightDown
+		u.action.animation.direction = DirRightDown
 	case 0.3 > u.Angle && u.Angle > -0.3:
-		u.animation.direction = DirDown
+		u.action.animation.direction = DirDown
 	case -0.3 >= u.Angle && u.Angle > -1.3:
-		u.animation.direction = DirLeftDown
+		u.action.animation.direction = DirLeftDown
 	case -1.3 >= u.Angle && u.Angle > -1.7:
-		u.animation.direction = DirLeft
+		u.action.animation.direction = DirLeft
 	case -1.7 >= u.Angle && u.Angle > -2.8:
-		u.animation.direction = DirLeftUp
+		u.action.animation.direction = DirLeftUp
 	default:
-		u.animation.direction = DirLeft
+		u.action.animation.direction = DirLeft
 	}
 }
 
@@ -83,8 +66,6 @@ func (u *Unit) tryMove(objects *common.InteractableList) {
 }
 
 func (u *Unit) stopUnit() {
-	u.GoalX = float64(u.X)
-	u.GoalY = float64(u.Y)
 	u.vx = 0
 	u.vy = 0
 }
@@ -94,8 +75,8 @@ func (u *Unit) holdUnitInBorderMap(levelDimentions image.Point) {
 
 	top := image.Point{1600, 0}
 	bottom := image.Point{1600, 1600}
-	topToUnitVector := image.Rectangle{top, u.Centr()}
-	bottomToUnitVector := image.Rectangle{bottom, u.Centr()}
+	topToUnitVector := image.Rectangle{top, u.Point()}
+	bottomToUnitVector := image.Rectangle{bottom, u.Point()}
 	u.TopAngle = math.Atan2(float64(topToUnitVector.Dx()), float64(topToUnitVector.Dy()))
 	u.BottomAngle = math.Atan2(float64(bottomToUnitVector.Dx()), float64(bottomToUnitVector.Dy()))
 

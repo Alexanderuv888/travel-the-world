@@ -9,7 +9,7 @@ type CompositeTile struct {
 	Images []*ebiten.Image
 }
 
-func NewCompositeTile(tx, ty float64, w, h int, images ...*ebiten.Image) *CompositeTile {
+func NewCompositeTile(tx, ty float64, w, h int, images []*ebiten.Image) *CompositeTile {
 	return &CompositeTile{
 		Sx:     1,
 		Sy:     1,

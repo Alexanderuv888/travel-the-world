@@ -40,7 +40,7 @@ func NewGame() (*Game, error) {
 		return nil, fmt.Errorf("failed to create new level: %s", err)
 	}
 	//camera := NewCamera(0, float64(l.H*l.TileH/2))
-	camera := NewCamera(0, 0)
+	camera := NewCamera(l.Width()/5, l.Height()/6)
 	unit := unit.NewUnit(0, l.Height()/2, assetsManager)
 
 	g := &Game{
@@ -59,12 +59,11 @@ func NewGame() (*Game, error) {
 func (g *Game) Draw(screen *ebiten.Image) {
 	g.CurrentLevel.drawLevel(screen, g.Camera)
 	dq := &tiles.DrawQueue{}
-	levelDimentions := image.Point{g.CurrentLevel.WidthInt(), g.CurrentLevel.HeightInt()}
 
-	g.Unit.Update(screen, dq, levelDimentions, g.AssetsManager)
+	g.Unit.Render(dq)
 
 	for _, unit := range g.CurrentLevel.units {
-		unit.Update(screen, dq, levelDimentions, g.AssetsManager)
+		unit.Render(dq)
 	}
 
 	for _, obj := range g.CurrentLevel.objects {
@@ -82,8 +81,8 @@ func (g *Game) drawDebugInfo(screen *ebiten.Image) {
 	mouseX, mouseY := ebiten.CursorPosition()
 	ebitenutil.DebugPrint(screen, fmt.Sprintf("KEYS WASD EC R\nFPS  %0.0f\nTPS  %0.0f\nangle  %0.2f\ntopAngle  %0.2f\nbottomAngle  %0.2f\nUnitPOS  %0.0f,%0.0f\nmousePOS  %0.0f,%0.0f", ebiten.ActualFPS(), ebiten.ActualTPS(), g.Unit.Angle, g.Unit.TopAngle, g.Unit.BottomAngle, g.Unit.X, g.Unit.Y, float64(mouseX)+g.Camera.X, float64(mouseY)+g.Camera.Y))
 
-	x1, y1 := g.Unit.X-g.Camera.X, g.Unit.Y-g.Camera.Y         //WorldToIso(g.Unit.X, g.Unit.Y, 64, 32, g.Camera.X, g.Camera.Y)
-	x2, y2 := g.Unit.GoalX-g.Camera.X, g.Unit.GoalY-g.Camera.Y //WorldToIso(g.Unit.GoalX, g.Unit.GoalY, 64, 32, g.Camera.X, g.Camera.Y)
+	x1, y1 := g.Unit.X-g.Camera.X, g.Unit.Y-g.Camera.Y             //WorldToIso(g.Unit.X, g.Unit.Y, 64, 32, g.Camera.X, g.Camera.Y)
+	x2, y2 := g.Unit.GoalX()-g.Camera.X, g.Unit.GoalY()-g.Camera.Y //WorldToIso(g.Unit.GoalX, g.Unit.GoalY, 64, 32, g.Camera.X, g.Camera.Y)
 	vector.StrokeLine(screen, float32(x1), float32(y1), float32(x2), float32(y2), 1, color.RGBA{255, 0, 0, 255}, false)
 }
 
@@ -92,15 +91,19 @@ func (g *Game) Layout(screenWidth, screenHeight int) (int, int) {
 }
 
 func (g *Game) Update() error {
-	g.Camera.Update()
+	g.listenKeyBoardAndMouse()
 	levelDimentions := image.Point{g.CurrentLevel.WidthInt(), g.CurrentLevel.HeightInt()}
-	cameraPos := image.Point{int(g.Camera.X), int(g.Camera.Y)}
 
-	g.Unit.Move(g.CurrentLevel.objects, g.CurrentLevel.units, levelDimentions, cameraPos)
+	g.Unit.Update(g.CurrentLevel.objects, g.CurrentLevel.units, levelDimentions)
 	for _, npc := range g.CurrentLevel.units {
-		npc.Move(g.CurrentLevel.objects, g.CurrentLevel.units, levelDimentions, cameraPos)
+		npc.Update(g.CurrentLevel.objects, g.CurrentLevel.units, levelDimentions)
 	}
 	return nil
+}
+
+func (g *Game) listenKeyBoardAndMouse() {
+	g.Camera.Update()
+	g.Unit.ListenKeyBoard(g.Camera.Pos())
 }
 
 func WorldToScreenIso(x, y float64, tileW, tileH int, cameraX, cameraY float64) (float64, float64) {

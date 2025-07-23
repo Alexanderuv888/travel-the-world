@@ -28,3 +28,7 @@ func (us *USet) weaponTSN() string {
 func (us *USet) shieldTSN() string {
 	return fmt.Sprintf("%s/%s", us.uType, us.shield)
 }
+
+func (us *USet) getAllTsn() []string {
+	return []string{us.armorTSN(), us.headTSN(), us.weaponTSN(), us.shieldTSN()}
+}

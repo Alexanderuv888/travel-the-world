@@ -55,7 +55,7 @@ func NewLevel(name string, am *assets.Manager) (*Level, error) {
 		background: background,
 		tmap:       tmap,
 	}
-	l.createUnits(50)
+	l.createUnits(200)
 	return l, nil
 }
 

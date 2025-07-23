@@ -2,88 +2,139 @@ package unit
 
 import (
 	"fmt"
-	"image"
+	"image/color"
+	"log"
 	"travel-the-world/assets"
 	"travel-the-world/tiles"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/vector"
 )
 
 type animation struct {
+	aSets     map[string]*assets.AnimationSet
 	aType     assets.Action
 	direction assets.Direction
 	us        USet
 	CTile     *tiles.CompositeTile
 	tick      int
 	current   int
+	len       int
+	rate      int
+	freez     bool
 }
 
 func NewAnimation(x, y float64, am *assets.Manager) *animation {
 	us := USet{Hero, Clothes, Male_head1, Shortsword, Buckler}
 
-	armorAnimationSet, _ := am.LoadAnimationSet(unitBaseFolder, us.armorTSN())
-	headAnimationSet, _ := am.LoadAnimationSet(unitBaseFolder, us.headTSN())
-	weaponAnimationSet, _ := am.LoadAnimationSet(unitBaseFolder, us.weaponTSN())
-	shieldAnimationSet, _ := am.LoadAnimationSet(unitBaseFolder, us.shieldTSN())
-
-	armorFrame := armorAnimationSet.GetFrame(fmt.Sprintf("%s/%s", us.armorTSN(), ActionIdle), DirLeft, 0)
-	headFrame := headAnimationSet.GetFrame(fmt.Sprintf("%s/%s", us.headTSN(), ActionIdle), DirLeft, 0)
-	weaponFrame := weaponAnimationSet.GetFrame(fmt.Sprintf("%s/%s", us.weaponTSN(), ActionIdle), DirLeft, 0)
-	shieldFrame := shieldAnimationSet.GetFrame(fmt.Sprintf("%s/%s", us.shieldTSN(), ActionIdle), DirLeft, 0)
-
-	ct := tiles.NewCompositeTile(x, y, frameWidth, frameHeight, armorFrame, headFrame, weaponFrame, shieldFrame)
-	return &animation{
+	a := &animation{
+		aSets:     make(map[string]*assets.AnimationSet),
 		direction: DirLeft,
 		aType:     ActionIdle,
 		us:        us,
-		CTile:     ct,
 	}
+	a.loadAS(am)
+	ct := tiles.NewCompositeTile(x, y, frameWidth, frameHeight, a.getImages())
+	a.CTile = ct
+	a.updateASLen()
+	a.updateASRate()
+	return a
 }
 
-func (u *Unit) updateAnimation(screen *ebiten.Image, levelDimentions image.Point, am *assets.Manager) {
-	u.animation.tick++
-	armorAS, _ := am.LoadAnimationSet(unitBaseFolder, u.animation.us.armorTSN())
-	headAS, _ := am.LoadAnimationSet(unitBaseFolder, u.animation.us.headTSN())
-	weaponAS, _ := am.LoadAnimationSet(unitBaseFolder, u.animation.us.weaponTSN())
-	shieldAS, _ := am.LoadAnimationSet(unitBaseFolder, u.animation.us.shieldTSN())
+func (u *Unit) Width() float64 {
+	return u.action.animation.CTile.Width()
+}
 
-	animationName := fmt.Sprintf("%s/%s", u.animation.us.armorTSN(), u.animation.aType)
-	if u.animation.tick%armorAS.GetAnimationFrameRate(animationName) == 0 {
-		u.animation.current++
-		if u.animation.current >= armorAS.GetAnimationLength(animationName, u.animation.direction) {
-			u.animation.current = 0
+func (u *Unit) Height() float64 {
+	return u.action.animation.CTile.Height()
+}
+
+func (u *Unit) ScreenY() float64 {
+	return u.action.animation.CTile.ScreenY()
+}
+
+func (u *Unit) Draw(screen *ebiten.Image, cameraX, cameraY float64) {
+	if u.IsAlive() {
+		u.drawHealth(screen, cameraX, cameraY)
+	}
+	u.action.animation.CTile.Draw(screen, cameraX, cameraY)
+}
+
+func (u *Unit) drawHealth(screen *ebiten.Image, cameraX, cameraY float64) {
+	lineLenght := 20
+	lineHeight := 60
+	mx1 := u.Point().X - lineLenght/2 - int(cameraX)
+	mx2 := mx1 + lineLenght
+	my1 := u.Point().Y - lineHeight - int(cameraY)
+	my2 := my1
+	vector.StrokeLine(screen, float32(mx1), float32(my1), float32(mx2), float32(my2), 2, color.RGBA{255, 0, 0, 255}, false)
+
+	x1 := u.Point().X - lineLenght/2 - int(cameraX)
+	x2 := x1 + ((lineLenght / u.stats.maxHealth) * u.stats.health)
+	y1 := u.Point().Y - lineHeight - int(cameraY)
+	y2 := y1
+	vector.StrokeLine(screen, float32(x1), float32(y1), float32(x2), float32(y2), 2, color.RGBA{0, 255, 0, 255}, false)
+}
+
+func (u *Unit) updateAnimation() {
+	if u.action.animation.freez {
+		return
+	}
+	u.action.animation.tick++
+
+	if u.action.animation.tick%u.action.animation.rate == 0 {
+		u.action.animation.current++
+		if u.action.animation.current >= u.action.animation.len {
+			u.action.animation.current = 0
 		}
 	}
-	u.animation.CTile.Tx = u.X - frameWidth*0.5
-	u.animation.CTile.Ty = u.Y - frameHeight*0.75
+	u.action.animation.CTile.Tx = u.X - frameWidth*0.5
+	u.action.animation.CTile.Ty = u.Y - frameHeight*0.75
 
-	u.animation.CTile.Images = []*ebiten.Image{armorAS.GetFrame(animationName, u.animation.direction, u.animation.current),
-		headAS.GetFrame(fmt.Sprintf("%s/%s", u.animation.us.headTSN(), u.animation.aType), u.animation.direction, u.animation.current),
-		weaponAS.GetFrame(fmt.Sprintf("%s/%s", u.animation.us.weaponTSN(), u.animation.aType), u.animation.direction, u.animation.current),
-		shieldAS.GetFrame(fmt.Sprintf("%s/%s", u.animation.us.shieldTSN(), u.animation.aType), u.animation.direction, u.animation.current),
+	u.action.animation.CTile.Images = u.action.animation.getImages()
+}
+
+func (u *Unit) setAnimation(newAction assets.Action, needToStop bool) {
+	if u.action.animation.aType != newAction {
+		if needToStop {
+			u.stopUnit()
+		}
+		u.action.animation.current = 0
+		u.action.animation.aType = newAction
+		u.action.animation.loadAS(u.am)
+		u.action.animation.updateASLen()
+		u.action.animation.updateASRate()
 	}
 }
 
-func (u *Unit) updateAnamationType() {
-	if ebiten.IsKeyPressed(ebiten.KeyA) {
-		u.stopUnit()
-		u.setAnimation(ActionAttack)
-	} else if ebiten.IsKeyPressed(ebiten.KeyS) {
-		u.stopUnit()
-		u.setAnimation(ActionShoot)
-	} else if ebiten.IsKeyPressed(ebiten.KeyD) {
-		u.stopUnit()
-		u.setAnimation(ActionDie)
-	} else if u.vx == 0 || u.vy == 0 {
-		u.setAnimation(ActionIdle)
-	} else {
-		u.setAnimation(ActionRun)
+func (a *animation) getImages() (images []*ebiten.Image) {
+	for name, as := range a.aSets {
+		animName := fmt.Sprintf("%s/%s", name, a.aType)
+		image := as.GetFrame(animName, a.direction, a.current)
+		if image != nil {
+			images = append(images, image)
+		}
 	}
+	return images
 }
 
-func (u *Unit) setAnimation(newAction assets.Action) {
-	if u.animation.aType != newAction {
-		u.animation.current = 0
-		u.animation.aType = newAction
+func (a *animation) updateASLen() {
+	a.len = a.aSets[a.us.armorTSN()].GetAnimationLength(fmt.Sprintf("%s/%s", a.us.armorTSN(), a.aType), a.direction)
+}
+
+func (a *animation) updateASRate() {
+	animationName := fmt.Sprintf("%s/%s", a.us.armorTSN(), a.aType)
+	a.rate = a.aSets[a.us.armorTSN()].GetAnimationFrameRate(animationName)
+
+}
+
+func (a *animation) loadAS(am *assets.Manager) {
+	for _, tsn := range a.us.getAllTsn() {
+		as, err := am.LoadAnimationSet(unitBaseFolder, tsn)
+		if err != nil {
+			log.Fatal(err)
+		} else {
+			a.aSets[string(tsn)] = as
+		}
 	}
 }

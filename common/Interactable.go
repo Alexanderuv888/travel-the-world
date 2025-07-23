@@ -3,9 +3,9 @@ package common
 import "image"
 
 type Interactable interface {
+	Target
 	ObjType() ObjType
 	Rect() image.Rectangle
-	Centr() image.Point
 	Interact(obj Interactable)
 }
 

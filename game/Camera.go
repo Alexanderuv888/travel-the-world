@@ -1,6 +1,10 @@
 package game
 
-import "github.com/hajimehoshi/ebiten/v2"
+import (
+	"image"
+
+	"github.com/hajimehoshi/ebiten/v2"
+)
 
 const (
 	cameraSpeed = 3.0
@@ -17,6 +21,10 @@ func NewCamera(x, y float64) *Camera {
 		X: x,
 		Y: y,
 	}
+}
+
+func (camera *Camera) Pos() image.Point {
+	return image.Point{int(camera.X), int(camera.Y)}
 }
 
 func (camera *Camera) Update() {
