@@ -3,8 +3,6 @@ package unit
 import (
 	"image"
 	"math"
-	"math/rand"
-	"time"
 	"travel-the-world/common"
 )
 
@@ -40,25 +38,10 @@ func (u *Unit) InteractWithAll(objects *common.InteractableList) {
 		return
 	}
 	for _, obj := range objects.Items {
-		if u == obj {
-			continue
-		}
-		if u.isInVision(obj) {
-			if target, ok := obj.(common.Damagable); ok {
-				if target.IsAlive() && u.closerThenCurrentTarget(target) {
-					u.Command(Attack, target)
-				}
-			}
-		}
+		u.interactWith(obj)
 	}
 
-	if u.target == nil {
-		src := rand.NewSource(time.Now().UnixNano())
-		r := rand.New(src)
-		x := r.Intn(3200)
-		y := r.Intn(1600)
-		u.MoveToPoint(image.Point{x, y})
-	}
+	u.walk()
 }
 
 func (u *Unit) closerThenCurrentTarget(target common.Target) bool {

@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "",
+    "activeFile": "/Users/vols/Projects/travel-the-world/assets/levels/level_2/longsword.tsx",
     "expandedProjectPaths": [
     ],
     "file.lastUsedOpenFilter": "All Files (*)",
@@ -14,7 +14,9 @@
             "scaleInEditor": 1
         },
         "/Users/vols/Projects/travel-the-world/assets/levels/level_2/clothes.tsx": {
-            "dynamicWrapping": false
+            "dynamicWrapping": false,
+            "scaleInDock": 1,
+            "scaleInEditor": 2.3041
         },
         "/Users/vols/Projects/travel-the-world/assets/levels/level_2/dirt_128x64.tsx": {
             "scaleInDock": 1,
@@ -26,22 +28,49 @@
         },
         "/Users/vols/Projects/travel-the-world/assets/levels/level_2/grassland_tiles.tsx": {
             "dynamicWrapping": false,
-            "scaleInEditor": 0.66
+            "scaleInDock": 0.8815,
+            "scaleInEditor": 1.9793
         },
         "/Users/vols/Projects/travel-the-world/assets/levels/level_2/house.tsx": {
-            "dynamicWrapping": true
+            "dynamicWrapping": true,
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "/Users/vols/Projects/travel-the-world/assets/levels/level_2/level_2.tmx": {
+            "expandedGroupLayers": [
+                2,
+                15
+            ],
+            "scale": 0.39,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 1624.3589743589741,
+                "y": 624.3589743589743
+            }
         },
         "/Users/vols/Projects/travel-the-world/assets/levels/level_2/longsword.tsx": {
-            "dynamicWrapping": false
+            "dynamicWrapping": false,
+            "scaleInDock": 1.4013,
+            "scaleInEditor": 0.9869
         },
         "/Users/vols/Projects/travel-the-world/assets/levels/level_2/male_head1.tsx": {
-            "dynamicWrapping": false
+            "dynamicWrapping": false,
+            "scaleInDock": 1,
+            "scaleInEditor": 2.4405
         },
         "/Users/vols/Projects/travel-the-world/assets/levels/level_2/sand_64x32.tsx": {
-            "dynamicWrapping": false
+            "dynamicWrapping": false,
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "/Users/vols/Projects/travel-the-world/assets/levels/level_2/shield.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1.7069
         },
         "/Users/vols/Projects/travel-the-world/assets/levels/level_2/tree.tsx": {
-            "dynamicWrapping": true
+            "dynamicWrapping": true,
+            "scaleInDock": 1,
+            "scaleInEditor": 1
         },
         "/Users/vols/Projects/travel-the-world/assets/levels/level_2/tree_1.tsx": {
             "dynamicWrapping": false,
@@ -60,15 +89,31 @@
     "map.tileWidth": 64,
     "map.width": 50,
     "openFiles": [
+        "/Users/vols/Projects/travel-the-world/assets/levels/level_2/level_2.tmx",
+        "/Users/vols/Projects/travel-the-world/assets/levels/level_2/sand_64x32.tsx",
+        "/Users/vols/Projects/travel-the-world/assets/levels/level_2/grassland_tiles.tsx",
+        "/Users/vols/Projects/travel-the-world/assets/levels/level_2/house.tsx",
+        "/Users/vols/Projects/travel-the-world/assets/levels/level_2/tree.tsx",
+        "/Users/vols/Projects/travel-the-world/assets/levels/level_2/clothes.tsx",
+        "/Users/vols/Projects/travel-the-world/assets/levels/level_2/male_head1.tsx",
+        "/Users/vols/Projects/travel-the-world/assets/levels/level_2/shield.tsx",
+        "/Users/vols/Projects/travel-the-world/assets/levels/level_2/longsword.tsx"
     ],
     "project": "level_1.tiled-project",
     "property.type": "string",
     "recentFiles": [
+        "/Users/vols/Projects/travel-the-world/assets/levels/level_2/level_2.tmx",
+        "/Users/vols/Projects/travel-the-world/assets/levels/level_2/sand_64x32.tsx",
+        "/Users/vols/Projects/travel-the-world/assets/levels/level_2/grassland_tiles.tsx",
+        "/Users/vols/Projects/travel-the-world/assets/levels/level_2/house.tsx",
+        "/Users/vols/Projects/travel-the-world/assets/levels/level_2/tree.tsx",
+        "/Users/vols/Projects/travel-the-world/assets/levels/level_2/clothes.tsx",
+        "/Users/vols/Projects/travel-the-world/assets/levels/level_2/male_head1.tsx",
+        "/Users/vols/Projects/travel-the-world/assets/levels/level_2/shield.tsx",
+        "/Users/vols/Projects/travel-the-world/assets/levels/level_2/longsword.tsx",
         "/Users/vols/Projects/travel-the-world/assets/levels/level_2/baseman.tsx",
         "/Users/vols/Projects/travel-the-world/assets/levels/level_2/tree_1.tsx",
-        "/Users/vols/Projects/travel-the-world/assets/levels/level_2/grassland_tiles.tsx",
-        "/Users/vols/Projects/travel-the-world/assets/levels/level_2/dirt_128x64.tsx",
-        "dirt_64x32.tsx"
+        "/Users/vols/Projects/travel-the-world/assets/levels/level_2/dirt_128x64.tsx"
     ],
     "tileset.lastUsedFormat": "tsx",
     "tileset.tileSize": {
