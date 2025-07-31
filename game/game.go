@@ -114,7 +114,6 @@ func (g *Game) listenKeyBoardAndMouse() {
 			obj.Highlight()
 		}
 	}
-
 }
 
 func WorldToScreenIso(x, y float64, tileW, tileH int, cameraX, cameraY float64) (float64, float64) {

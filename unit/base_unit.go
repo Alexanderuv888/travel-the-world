@@ -20,7 +20,7 @@ type Unit struct {
 	TopAngle    float64
 	BottomAngle float64
 	Behavior    Behavior
-	highlight   bool
+	highlight   int
 }
 
 func NewUnit(x, y float64, am *assets.Manager, behavior Behavior) *Unit {

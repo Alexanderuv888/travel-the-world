@@ -72,16 +72,16 @@ func (u *Unit) drawHealth(screen *ebiten.Image, cameraX, cameraY float64) {
 	cx2 := x1 + lineLenght*u.Stats.health/u.Stats.maxHealth
 	vector.StrokeLine(screen, float32(x1), float32(y1), float32(cx2), float32(y2), 2, color.RGBA{0, 255, 0, 255}, false)
 
-	if u.highlight {
+	if u.highlight > 0 {
 		circleX := float32(u.X - cameraX)
 		circleY := float32(u.Y - cameraY)
 		r := float32(u.Rect().Size().X) * 0.6
 		vector.StrokeCircle(screen, circleX, circleY, r, 7, color.RGBA{200, 200, 0, 255}, false)
-		u.highlight = false
+		u.highlight--
 	}
 }
 func (u *Unit) Highlight() {
-	u.highlight = true
+	u.highlight = 3
 }
 
 func (u *Unit) updateAnimation() {
