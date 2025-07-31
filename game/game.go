@@ -8,6 +8,7 @@ import (
 	"travel-the-world/assets"
 	"travel-the-world/camera"
 	"travel-the-world/common"
+	"travel-the-world/hud"
 	"travel-the-world/level"
 	"travel-the-world/tiles"
 	"travel-the-world/unit"
@@ -23,6 +24,7 @@ type Game struct {
 	CurrentLevel  *level.Level
 	WorldCtx      *world.Context
 	Unit          *unit.Unit
+	hud           *hud.HUD
 
 	Camera *camera.Camera
 
@@ -49,7 +51,7 @@ func NewGame() (*Game, error) {
 	worldCtx := &world.Context{InteractableList: *ilist, CameraPos: camera.Pos()}
 
 	g := &Game{
-
+		hud:           hud.NewHUD(unit),
 		AssetsManager: assetsManager,
 		CurrentLevel:  l,
 		WorldCtx:      worldCtx,
@@ -75,6 +77,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 
 	dq.DrawAll(screen, g.Camera.X, g.Camera.Y)
 	dq.Clear()
+	g.hud.Draw(screen)
 	g.drawDebugInfo(screen)
 
 }

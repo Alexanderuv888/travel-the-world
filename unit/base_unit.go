@@ -52,6 +52,7 @@ func (u *Unit) Update(worldCtx *world.Context, levelDimentions image.Point) {
 		u.Move(worldCtx)
 		u.Behavior.Update(u, worldCtx)
 	}
+	u.updateStats()
 }
 
 func IsoToWorld(isoX, isoY float64, levelDimentions image.Point) (x, y float64) {

@@ -1,14 +1,15 @@
 package unit
 
 import (
+	"math/rand/v2"
 	"travel-the-world/common"
 )
 
 func (u *Unit) TakeDamage(dmg int) bool {
-
 	if u.IsAlive() {
 		u.playSwordAttack()
 		u.Stats.health -= dmg
+		u.Stats.stamina -= dmg / 2
 		if u.IsDead() {
 			playSound(u.sound.diePool, 1)
 			u.Command(Die, nil)
@@ -19,10 +20,20 @@ func (u *Unit) TakeDamage(dmg int) bool {
 	}
 }
 
+func (u *Unit) GetDamage() int {
+	kStamina := u.Stats.stamina / u.Stats.maxStamina
+	crit := rand.Float64() + float64(kStamina)
+	if crit < 1 {
+		crit = 1
+	}
+	return u.Stats.damage * kStamina * int(crit)
+}
+
 func (u *Unit) Damage(target common.Damagable) {
 	if target != nil {
 		if attackedUnit, ok := target.(common.Fightable); ok && target.TakeDamage(u.Stats.damage) {
 			if target.IsAlive() {
+				u.Stats.stamina--
 				attackedUnit.Attack(u)
 			} else {
 				u.AddExp(10)
