@@ -4,12 +4,13 @@ import (
 	"image"
 	"travel-the-world/assets"
 	"travel-the-world/common"
-	"travel-the-world/tiles"
+	"travel-the-world/world"
 )
 
 type Unit struct {
 	am          *assets.Manager
-	stats       *stats
+	sound       *sound
+	Stats       *Stats
 	X, Y        float64       // позиция юнита
 	vx, vy      float64       // скорость юнита
 	target      common.Target // желаемая позиция юнита
@@ -18,36 +19,39 @@ type Unit struct {
 	action      action
 	TopAngle    float64
 	BottomAngle float64
+	Behavior    Behavior
+	highlight   bool
 }
 
-func NewUnit(x, y float64, am *assets.Manager) *Unit {
+func NewUnit(x, y float64, am *assets.Manager, behavior Behavior) *Unit {
 	a := NewAnimation(x, y, am)
 	action := action{Stop, nil, a, false}
-	stats := stats{Alive, 12, 12, 2, 50, 350, speed}
+	stats := NewStats(12, 12, 2, 50, 350, speed)
 
 	u := &Unit{
-		am:     am,
-		stats:  &stats,
-		X:      x,
-		Y:      y,
-		vx:     0,
-		vy:     0,
-		Angle:  0,
-		sx:     1,
-		sy:     1,
-		action: action,
+		am:       am,
+		sound:    NewSound(am),
+		Stats:    stats,
+		X:        x,
+		Y:        y,
+		vx:       0,
+		vy:       0,
+		Angle:    0,
+		sx:       1,
+		sy:       1,
+		action:   action,
+		Behavior: behavior,
 	}
 	return u
 }
 
-func (u *Unit) Update(objects []*tiles.ObjectTile, units []*Unit, levelDimentions image.Point) {
-	iset := &common.InteractableList{}
-	for _, npc := range units {
-		iset.Add(npc)
-	}
-	u.updateAction(iset, levelDimentions)
+func (u *Unit) Update(worldCtx *world.Context, levelDimentions image.Point) {
 
-	u.InteractWithAll(iset)
+	u.updateAction(&worldCtx.InteractableList, levelDimentions)
+	if u.IsAlive() {
+		u.Move(worldCtx)
+		u.Behavior.Update(u, worldCtx)
+	}
 }
 
 func IsoToWorld(isoX, isoY float64, levelDimentions image.Point) (x, y float64) {

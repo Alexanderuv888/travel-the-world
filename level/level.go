@@ -1,7 +1,8 @@
-package game
+package level
 
 import (
 	"errors"
+	"image"
 	"log"
 	"math/rand/v2"
 	"path/filepath"
@@ -26,8 +27,8 @@ type Level struct {
 	am           *assets.Manager
 	background   *ebiten.Image
 	tmap         *tiled.Map
-	objects      []*tiles.ObjectTile
-	units        []*unit.Unit
+	Objects      []*tiles.ObjectTile
+	Units        []*unit.Unit
 }
 
 func NewLevel(name string, am *assets.Manager) (*Level, error) {
@@ -55,7 +56,6 @@ func NewLevel(name string, am *assets.Manager) (*Level, error) {
 		background: background,
 		tmap:       tmap,
 	}
-	l.createUnits(200)
 	return l, nil
 }
 
@@ -63,15 +63,15 @@ func (l *Level) Size() (width, height int) {
 	return l.W, l.H
 }
 
-func (l *Level) addObject(tx, ty float64, w, h int, img *ebiten.Image) {
-	l.objects = append(l.objects, tiles.NewObjectTile(tx, ty, w, h, img))
+func (l *Level) AddObject(tx, ty float64, w, h int, img *ebiten.Image) {
+	l.Objects = append(l.Objects, tiles.NewObjectTile(tx, ty, w, h, img))
 }
 
-func (l *Level) createUnits(amount int) {
+func (l *Level) CreateUnits(amount int) {
 	for range make([]struct{}, amount) {
 		x, y := l.getRandomCoordinates()
-		unit := unit.NewUnit(x, y, l.am)
-		l.units = append(l.units, unit)
+		unit := unit.NewUnit(x, y, l.am, &unit.IdleBehavior{})
+		l.Units = append(l.Units, unit)
 	}
 }
 
@@ -98,7 +98,7 @@ func (l *Level) drawIsoLayer(background *ebiten.Image, layer *tiled.Layer, ts *t
 			screenX := float64((x-y)*(l.TileW/2)+offsetX) + float64(l.W*l.TileW/2-l.TileW/2)
 			screenY := float64((x+y)*(l.TileH/2)+offsetY) + padding
 			if layer.Name == "tree" {
-				l.addObject(screenX, screenY, l.TileW, l.TileH, tiles[tile.ID])
+				l.AddObject(screenX, screenY, l.TileW, l.TileH, tiles[tile.ID])
 			} else {
 				op := &ebiten.DrawImageOptions{}
 				op.GeoM.Translate(screenX, screenY)
@@ -108,17 +108,17 @@ func (l *Level) drawIsoLayer(background *ebiten.Image, layer *tiled.Layer, ts *t
 	}
 }
 
-func (l *Level) drawLevel(screen *ebiten.Image, camera *Camera) {
+func (l *Level) DrawLevel(screen *ebiten.Image, cameraPos image.Point) {
 	if l.needUpdate {
-		l.update(camera)
+		l.Update(cameraPos)
 		l.needUpdate = false
 	}
 	op := &ebiten.DrawImageOptions{}
-	op.GeoM.Translate(-camera.X, -camera.Y)
+	op.GeoM.Translate(-float64(cameraPos.X), -float64(cameraPos.Y))
 	screen.DrawImage(l.background, op)
 }
 
-func (l *Level) update(camera *Camera) {
+func (l *Level) Update(cameraPos image.Point) {
 	for _, layer := range l.tmap.Layers {
 		if !layer.Visible {
 			continue

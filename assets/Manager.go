@@ -1,15 +1,15 @@
 package assets
 
 import (
+	"bytes"
 	"fmt"
 	"image"
-	"log"
 	"os"
 	"strconv"
 
-	"github.com/hajimehoshi/ebiten/audio"
-	"github.com/hajimehoshi/ebiten/audio/wav"
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/audio"
+	"github.com/hajimehoshi/ebiten/v2/audio/wav"
 	"golang.org/x/image/font"
 	"golang.org/x/image/font/opentype"
 )
@@ -17,21 +17,24 @@ import (
 type Manager struct {
 	animationSet map[string]*AnimationSet
 	images       map[string]*ebiten.Image
-	sounds       map[string]*audio.Player
+	soundsFiles  map[string]*[]byte
 	fonts        map[string]font.Face
 
 	audioCtx *audio.Context
 }
 
+const (
+	sr48000 int = 48000
+	sr44100 int = 44100
+)
+
 func NewManager() *Manager {
-	audioCtx, err := audio.NewContext(44100)
-	if err != nil {
-		log.Fatal(err)
-	}
+	audioCtx := audio.NewContext(sr48000)
+
 	return &Manager{
 		animationSet: make(map[string]*AnimationSet),
 		images:       make(map[string]*ebiten.Image),
-		sounds:       make(map[string]*audio.Player),
+		soundsFiles:  make(map[string]*[]byte),
 		fonts:        make(map[string]font.Face),
 		audioCtx:     audioCtx,
 	}
@@ -69,25 +72,35 @@ func (a *Manager) LoadImage(path string) (*ebiten.Image, error) {
 	return img, nil
 }
 
-func (a *Manager) LoadSound(path string) (*audio.Player, error) {
-	if s, ok := a.sounds[path]; ok {
+func (a *Manager) loadSound(path string) (*[]byte, error) {
+	if s, ok := a.soundsFiles[path]; ok {
 		return s, nil
 	}
-	f, err := os.Open(path)
+	data, err := os.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}
-	defer f.Close()
 
-	stream, err := wav.Decode(a.audioCtx, f)
+	a.soundsFiles[path] = &data
+	return &data, nil
+}
+
+func (a *Manager) CreatePlyerFor(path string) (*audio.Player, error) {
+	data, err := a.loadSound(path)
 	if err != nil {
 		return nil, err
 	}
-	player, err := audio.NewPlayer(a.audioCtx, stream)
+
+	stream, err := wav.DecodeWithSampleRate(a.audioCtx.SampleRate(), bytes.NewReader(*data))
 	if err != nil {
 		return nil, err
 	}
-	a.sounds[path] = player
+
+	player, err := a.audioCtx.NewPlayer(stream)
+	if err != nil {
+		return nil, err
+	}
+
 	return player, nil
 }
 

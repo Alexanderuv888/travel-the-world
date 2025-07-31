@@ -1,36 +1,52 @@
 package unit
 
 import (
-	"math"
 	"travel-the-world/common"
 )
 
 func (u *Unit) TakeDamage(dmg int) bool {
-	if u.stats.health > 0 {
-		u.stats.health -= dmg
+
+	if u.IsAlive() {
+		u.playSwordAttack()
+		u.Stats.health -= dmg
+		if u.IsDead() {
+			playSound(u.sound.diePool, 1)
+			u.Command(Die, nil)
+		}
 		return true
 	} else {
-		u.Command(Die, nil)
 		return false
 	}
 }
 
 func (u *Unit) Damage(target common.Damagable) {
-	target.TakeDamage(u.stats.damage)
+	if target != nil {
+		if attackedUnit, ok := target.(common.Fightable); ok && target.TakeDamage(u.Stats.damage) {
+			if target.IsAlive() {
+				attackedUnit.Attack(u)
+			} else {
+				u.AddExp(10)
+				u.Command(Stop, nil)
+			}
+		}
+	}
+}
+
+func (u *Unit) Attack(target common.Damagable) {
+	if (u.action.command != Attack || u.closerThenCurrentTarget(target)) && target.IsAlive() {
+		u.Command(Attack, target)
+	}
 }
 
 func (u *Unit) IsDead() bool {
-	return u.stats.status == Dead
+	return u.Stats.health <= 0
 }
 
 func (u *Unit) IsAlive() bool {
-	return u.stats.status != Dead
+	return u.Stats.health > 0
 }
 
 func (u *Unit) isInAttackDistance(obj common.Target) bool {
-	dx := float64(obj.Point().X - u.Point().X)
-	dy := float64(obj.Point().Y - u.Point().Y)
-	distance := math.Sqrt(dx*dx + dy*dy)
-
-	return distance <= u.stats.attackDistance
+	distance := u.DistanceTo(obj.Point())
+	return distance <= u.Stats.AttackDistance
 }

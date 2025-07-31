@@ -6,8 +6,12 @@ import (
 	"image/color"
 	"math"
 	"travel-the-world/assets"
+	"travel-the-world/camera"
+	"travel-the-world/common"
+	"travel-the-world/level"
 	"travel-the-world/tiles"
 	"travel-the-world/unit"
+	"travel-the-world/world"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
@@ -15,41 +19,42 @@ import (
 )
 
 type Game struct {
-	w, h, int,
 	AssetsManager *assets.Manager
-	CurrentLevel *Level
-	Unit         *unit.Unit
+	CurrentLevel  *level.Level
+	WorldCtx      *world.Context
+	Unit          *unit.Unit
 
-	Camera *Camera
-
-	camX, camY float64
-	camScale   float64
-	camScaleTo float64
+	Camera *camera.Camera
 
 	mousePanX, mousePanY int
-
-	offscreen *ebiten.Image
 }
 
-// NewGame returns a new isometric demo Game.
 func NewGame() (*Game, error) {
 	assetsManager := assets.NewManager()
 
-	l, err := NewLevel("level_2", assetsManager)
+	l, err := level.NewLevel("level_2", assetsManager)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create new level: %s", err)
 	}
-	//camera := NewCamera(0, float64(l.H*l.TileH/2))
-	camera := NewCamera(l.Width()/5, l.Height()/6)
-	unit := unit.NewUnit(0, l.Height()/2, assetsManager)
+	camera := camera.NewCamera(l.Width()/5, l.Height()/6)
+	unit := unit.NewUnit(1600, 800, assetsManager, &unit.PlayerBehavior{})
+
+	l.CreateUnits(10)
+	l.Units = append(l.Units, unit)
+	ilist := &common.InteractableList{}
+	for _, npc := range l.Units {
+		ilist.Add(npc)
+	}
+
+	worldCtx := &world.Context{InteractableList: *ilist, CameraPos: camera.Pos()}
 
 	g := &Game{
+
 		AssetsManager: assetsManager,
 		CurrentLevel:  l,
+		WorldCtx:      worldCtx,
 		Unit:          unit,
 		Camera:        camera,
-		camScale:      1,
-		camScaleTo:    1,
 		mousePanX:     math.MinInt32,
 		mousePanY:     math.MinInt32,
 	}
@@ -57,20 +62,17 @@ func NewGame() (*Game, error) {
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-	g.CurrentLevel.drawLevel(screen, g.Camera)
+	g.CurrentLevel.DrawLevel(screen, g.WorldCtx.CameraPos)
 	dq := &tiles.DrawQueue{}
 
-	g.Unit.Render(dq)
-
-	for _, unit := range g.CurrentLevel.units {
+	for _, unit := range g.CurrentLevel.Units {
 		unit.Render(dq)
 	}
 
-	for _, obj := range g.CurrentLevel.objects {
+	for _, obj := range g.CurrentLevel.Objects {
 		dq.Add(obj)
 	}
 
-	// потом:
 	dq.DrawAll(screen, g.Camera.X, g.Camera.Y)
 	dq.Clear()
 	g.drawDebugInfo(screen)
@@ -92,18 +94,27 @@ func (g *Game) Layout(screenWidth, screenHeight int) (int, int) {
 
 func (g *Game) Update() error {
 	g.listenKeyBoardAndMouse()
+	ilist := unitToIntarectableList(g.CurrentLevel.Units)
+	g.WorldCtx.Update(g.Camera.Pos(), ilist)
 	levelDimentions := image.Point{g.CurrentLevel.WidthInt(), g.CurrentLevel.HeightInt()}
 
-	g.Unit.Update(g.CurrentLevel.objects, g.CurrentLevel.units, levelDimentions)
-	for _, npc := range g.CurrentLevel.units {
-		npc.Update(g.CurrentLevel.objects, g.CurrentLevel.units, levelDimentions)
+	for _, unit := range g.CurrentLevel.Units {
+		unit.Update(g.WorldCtx, levelDimentions)
 	}
 	return nil
 }
 
 func (g *Game) listenKeyBoardAndMouse() {
 	g.Camera.Update()
-	g.Unit.ListenKeyBoard(g.Camera.Pos())
+	x, y := ebiten.CursorPosition()
+
+	p := image.Point{x + g.Camera.Pos().X, y + g.Camera.Pos().Y}
+	for _, obj := range g.WorldCtx.InteractableList.Items {
+		if p.In(obj.Rect()) {
+			obj.Highlight()
+		}
+	}
+
 }
 
 func WorldToScreenIso(x, y float64, tileW, tileH int, cameraX, cameraY float64) (float64, float64) {
@@ -117,4 +128,12 @@ func WorldToIso(x, y float64, tileW, tileH int, cameraX, cameraY float64) (isoX,
 	isoY = (x + y) - cameraY
 
 	return
+}
+
+func unitToIntarectableList(units []*unit.Unit) common.InteractableList {
+	ilist := &common.InteractableList{}
+	for _, npc := range units {
+		ilist.Add(npc)
+	}
+	return *ilist
 }

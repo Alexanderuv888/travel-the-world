@@ -4,6 +4,10 @@ type InteractableList struct {
 	Items []Interactable
 }
 
+func (dq *InteractableList) AddAll(i ...Interactable) {
+	dq.Items = append(dq.Items, i...)
+}
+
 func (dq *InteractableList) Add(i Interactable) {
 	dq.Items = append(dq.Items, i)
 }

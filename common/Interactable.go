@@ -7,6 +7,7 @@ type Interactable interface {
 	ObjType() ObjType
 	Rect() image.Rectangle
 	Interact(obj Interactable)
+	Highlight()
 }
 
 type ObjType string

@@ -1,4 +1,4 @@
-package game
+package camera
 
 import (
 	"image"
@@ -11,9 +11,11 @@ const (
 )
 
 type Camera struct {
-	X, Y   float64
-	vx, vy float64
-	kx, ky float64
+	X, Y    float64
+	vx, vy  float64
+	kx, ky  float64
+	Scale   float64
+	ScaleTo float64
 }
 
 func NewCamera(x, y float64) *Camera {

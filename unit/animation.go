@@ -63,17 +63,25 @@ func (u *Unit) Draw(screen *ebiten.Image, cameraX, cameraY float64) {
 func (u *Unit) drawHealth(screen *ebiten.Image, cameraX, cameraY float64) {
 	lineLenght := 20
 	lineHeight := 60
-	mx1 := u.Point().X - lineLenght/2 - int(cameraX)
-	mx2 := mx1 + lineLenght
-	my1 := u.Point().Y - lineHeight - int(cameraY)
-	my2 := my1
-	vector.StrokeLine(screen, float32(mx1), float32(my1), float32(mx2), float32(my2), 2, color.RGBA{255, 0, 0, 255}, false)
-
 	x1 := u.Point().X - lineLenght/2 - int(cameraX)
-	x2 := x1 + ((lineLenght / u.stats.maxHealth) * u.stats.health)
+	x2 := x1 + lineLenght
 	y1 := u.Point().Y - lineHeight - int(cameraY)
 	y2 := y1
-	vector.StrokeLine(screen, float32(x1), float32(y1), float32(x2), float32(y2), 2, color.RGBA{0, 255, 0, 255}, false)
+	vector.StrokeLine(screen, float32(x1), float32(y1), float32(x2), float32(y2), 2, color.RGBA{255, 0, 0, 255}, false)
+
+	cx2 := x1 + lineLenght*u.Stats.health/u.Stats.maxHealth
+	vector.StrokeLine(screen, float32(x1), float32(y1), float32(cx2), float32(y2), 2, color.RGBA{0, 255, 0, 255}, false)
+
+	if u.highlight {
+		circleX := float32(u.X - cameraX)
+		circleY := float32(u.Y - cameraY)
+		r := float32(u.Rect().Size().X) * 0.6
+		vector.StrokeCircle(screen, circleX, circleY, r, 7, color.RGBA{200, 200, 0, 255}, false)
+		u.highlight = false
+	}
+}
+func (u *Unit) Highlight() {
+	u.highlight = true
 }
 
 func (u *Unit) updateAnimation() {

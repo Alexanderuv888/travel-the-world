@@ -14,8 +14,10 @@ type action struct {
 
 func (u *Unit) updateAction(iset *common.InteractableList, levelDimentions image.Point) {
 	/*if ebiten.IsKeyPressed(ebiten.KeyA) {
-		u.setAnimation(ActionAttack, true)
-	} else if ebiten.IsKeyPressed(ebiten.KeyS) {
+		u.target = u
+		u.Attack(iset, levelDimentions)
+	}
+	else if ebiten.IsKeyPressed(ebiten.KeyS) {
 		u.setAnimation(ActionShoot, true)
 	} else if ebiten.IsKeyPressed(ebiten.KeyD) {
 		u.setAnimation(ActionDie, true)
@@ -27,9 +29,9 @@ func (u *Unit) updateAction(iset *common.InteractableList, levelDimentions image
 
 	switch u.action.command {
 	case MoveTo:
-		u.moveTo(iset, levelDimentions)
+		u.moveToTarget()
 	case Attack:
-		u.Attack(iset, levelDimentions)
+		u.attack()
 	case Die:
 		u.Die()
 	default:
@@ -39,16 +41,14 @@ func (u *Unit) updateAction(iset *common.InteractableList, levelDimentions image
 
 }
 
-func (u *Unit) moveTo(iset *common.InteractableList, levelDimentions image.Point) {
+func (u *Unit) moveToTarget() {
 	u.setAnimation(ActionRun, false)
-	if u.target == nil || u.target.Point().In(u.Rect()) {
+	if u.target == nil || u.isInAttackDistance(u.target) {
 		u.Command(Stop, nil)
-	} else {
-		u.Move(iset, levelDimentions)
 	}
 }
 
-func (u *Unit) Attack(iset *common.InteractableList, levelDimentions image.Point) {
+func (u *Unit) attack() {
 	if target, ok := u.target.(common.Damagable); ok {
 		if target.IsDead() {
 			u.Command(Stop, nil)
@@ -62,7 +62,7 @@ func (u *Unit) Attack(iset *common.InteractableList, levelDimentions image.Point
 				u.action.finished = true
 			}
 		} else {
-			u.moveTo(iset, levelDimentions)
+			u.moveToTarget()
 		}
 	} else {
 		u.Command(Stop, nil)
@@ -82,7 +82,6 @@ func (a *action) isFinished() bool {
 
 func (u *Unit) Die() {
 	u.setAnimation(ActionDie, true)
-	u.stats.status = Dead
 	if u.action.isFinished() {
 		u.action.animation.freez = true
 	}

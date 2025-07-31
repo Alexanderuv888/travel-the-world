@@ -1,5 +1,5 @@
 package common
 
 type Fightable interface {
-	Attack(d *Damagable)
+	Attack(d Damagable)
 }

@@ -41,30 +41,31 @@ func (u *Unit) InteractWithAll(objects *common.InteractableList) {
 		u.interactWith(obj)
 	}
 
-	u.walk()
+	u.Walk()
 }
 
 func (u *Unit) closerThenCurrentTarget(target common.Target) bool {
 	if u.target == nil {
 		return true
 	}
-	dx := float64(target.Point().X - u.Point().X)
-	dy := float64(target.Point().Y - u.Point().Y)
-	newTargetDistance := math.Sqrt(dx*dx + dy*dy)
+	newTargetDistance := u.DistanceTo(target.Point())
+	currentTargetDistance := u.DistanceTo(u.target.Point())
 
-	cdx := float64(u.target.Point().X - u.Point().X)
-	cdy := float64(u.target.Point().Y - u.Point().Y)
-	currentTargetDistance := math.Sqrt(cdx*cdx + cdy*cdy)
-
-	return newTargetDistance <= currentTargetDistance
+	return newTargetDistance < currentTargetDistance
 }
 
-func (u *Unit) isInVision(obj common.Interactable) bool {
-	dx := float64(obj.Point().X - u.Point().X)
-	dy := float64(obj.Point().Y - u.Point().Y)
-	distance := math.Sqrt(dx*dx + dy*dy)
+func (u *Unit) IsInVision(obj common.Interactable) bool {
+	return u.DistanceTo(obj.Point()) <= u.Stats.Vision
+}
 
-	return distance <= u.stats.vision
+func (u *Unit) DistanceTo(point image.Point) float64 {
+	dx := float64(point.X - u.Point().X)
+	dy := float64(point.Y - u.Point().Y)
+	return math.Sqrt(dx*dx + dy*dy)
+}
+
+func (u Unit) IsEnemy(unit common.Damagable) bool {
+	return true
 }
 
 func (u *Unit) catchTarget(obj common.Interactable) {

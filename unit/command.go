@@ -22,11 +22,15 @@ func (u *Unit) Command(command Command, target common.Target) {
 	u.target = target
 }
 
-func (u *Unit) ListenKeyBoard(cameraPos image.Point) {
+func (u *Unit) ListenKeyBoard(cameraPos image.Point) bool {
 	if ebiten.IsMouseButtonPressed(ebiten.MouseButton0) {
 		GoalX, GoalY := ebiten.CursorPosition()
 		u.MoveToPoint(image.Point{GoalX + cameraPos.X, GoalY + cameraPos.Y})
+
+		u.PlayConfirmSpeach()
+		return true
 	}
+	return false
 }
 
 func (u *Unit) MoveToPoint(p image.Point) {

@@ -4,15 +4,20 @@ import (
 	"image"
 	"math"
 	"travel-the-world/common"
+	"travel-the-world/world"
 )
 
-func (u *Unit) Move(iset *common.InteractableList, levelDimentions image.Point) {
-
+func (u *Unit) Move(worldCtx *world.Context) {
+	if u.target == nil {
+		return
+	}
 	u.updateAngle()
 	u.updateDirection()
-	u.tryMove(iset)
+	u.tryMove(&worldCtx.InteractableList)
 
-	u.holdUnitInBorderMap(levelDimentions)
+	if reachBorderMap(u.Point()) {
+		u.Command(Stop, nil)
+	}
 }
 
 func (u *Unit) updateAngle() {
@@ -20,10 +25,14 @@ func (u *Unit) updateAngle() {
 	u.vy = 0
 
 	if u.target != nil {
-		goalVector := image.Rectangle{u.Point(), u.target.Point()}
-		u.Angle = math.Atan2(float64(goalVector.Dx()), float64(goalVector.Dy()))
+		u.Angle = countAngle(u.Point(), u.target.Point())
 		u.countSpeed()
 	}
+}
+
+func countAngle(p1 image.Point, p2 image.Point) float64 {
+	goalVector := image.Rectangle{p1, p2}
+	return math.Atan2(float64(goalVector.Dx()), float64(goalVector.Dy()))
 }
 
 func (u *Unit) countSpeed() {
@@ -55,6 +64,9 @@ func (u *Unit) updateDirection() {
 }
 
 func (u *Unit) tryMove(objects *common.InteractableList) {
+	if u.isInAttackDistance(u.target) {
+		return
+	}
 	u.X += u.vx
 	u.Y += u.vy
 	if objects != nil && u.faceWithObjects(objects) {
@@ -70,23 +82,36 @@ func (u *Unit) stopUnit() {
 	u.vy = 0
 }
 
-func (u *Unit) holdUnitInBorderMap(levelDimentions image.Point) {
+func reachBorderMap(p image.Point) bool {
 	// Не выходим за границы карты
-
 	top := image.Point{1600, 0}
+	left := image.Point{0, 800}
 	bottom := image.Point{1600, 1600}
-	topToUnitVector := image.Rectangle{top, u.Point()}
-	bottomToUnitVector := image.Rectangle{bottom, u.Point()}
-	u.TopAngle = math.Atan2(float64(topToUnitVector.Dx()), float64(topToUnitVector.Dy()))
-	u.BottomAngle = math.Atan2(float64(bottomToUnitVector.Dx()), float64(bottomToUnitVector.Dy()))
+	right := image.Point{3200, 800}
+	topToLeftVector := image.Rectangle{top, left}
+	topToRightVector := image.Rectangle{top, right}
+	bottomToLeftVector := image.Rectangle{bottom, left}
+	bottomToRightVector := image.Rectangle{bottom, right}
+	topToUnitVector := image.Rectangle{top, p}
+	bottomToUnitVector := image.Rectangle{bottom, p}
 
-	if 0 > u.TopAngle && u.TopAngle < -1.11 || 0 < u.TopAngle && u.TopAngle > 1.11 {
-		u.X = 1600
-		u.Y = 800
+	topLeftAngle := math.Atan2(float64(topToLeftVector.Dx()), float64(topToLeftVector.Dy()))
+	topRightAngle := math.Atan2(float64(topToRightVector.Dx()), float64(topToRightVector.Dy()))
+	bottomLeftAngle := math.Atan2(float64(bottomToLeftVector.Dx()), float64(bottomToLeftVector.Dy()))
+	bottomRightAngle := math.Atan2(float64(bottomToRightVector.Dx()), float64(bottomToRightVector.Dy()))
+	/*topLeftAngle = -1.11
+	topRightAngle = 1.11
+	bottomLeftAngle = -2.03
+	bottomRightAngle = 2.03*/
+	topAngle := math.Atan2(float64(topToUnitVector.Dx()), float64(topToUnitVector.Dy()))
+	bottomAngle := math.Atan2(float64(bottomToUnitVector.Dx()), float64(bottomToUnitVector.Dy()))
+
+	if 0 > topAngle && topAngle < topLeftAngle || 0 < topAngle && topAngle > topRightAngle {
+		return true
 	}
 
-	if 0 > u.BottomAngle && u.BottomAngle > -2.03 || 0 < u.BottomAngle && u.BottomAngle < 2.03 {
-		u.X = 1600
-		u.Y = 800
+	if 0 > bottomAngle && bottomAngle > bottomLeftAngle || 0 < bottomAngle && bottomAngle < bottomRightAngle {
+		return true
 	}
+	return false
 }
