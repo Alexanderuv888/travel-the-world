@@ -1,12 +1,13 @@
 package tiles
 
 import (
+	"image"
+	"travel-the-world/camera"
+
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
 type Drawable interface {
-	Width() float64
-	Height() float64
-	ScreenY() float64                                    // для сортировки по глубине
-	Draw(screen *ebiten.Image, cameraX, cameraY float64) // как отрисовывать себя
+	ScreenY() float64                                                                    // для сортировки по глубине
+	Draw(screen *ebiten.Image, camera *camera.Camera, playerPos image.Point, radius int) // как отрисовывать себя
 }

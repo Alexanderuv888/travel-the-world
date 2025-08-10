@@ -1,16 +1,15 @@
 package world
 
 import (
-	"image"
+	"travel-the-world/camera"
 	"travel-the-world/common"
 )
 
 type Context struct {
 	InteractableList common.InteractableList
-	CameraPos        image.Point
+	Camera           *camera.Camera
 }
 
-func (ctx *Context) Update(cameraPos image.Point, InteractableList common.InteractableList) {
-	ctx.CameraPos = cameraPos
+func (ctx *Context) Update(InteractableList common.InteractableList) {
 	ctx.InteractableList = InteractableList
 }

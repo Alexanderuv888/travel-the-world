@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "/Users/vols/Projects/travel-the-world/assets/levels/level_2/longsword.tsx",
+    "activeFile": "/Users/vols/Projects/travel-the-world/assets/levels/level_2/level_2.tmx",
     "expandedProjectPaths": [
     ],
     "file.lastUsedOpenFilter": "All Files (*)",
@@ -41,11 +41,11 @@
                 2,
                 15
             ],
-            "scale": 0.39,
+            "scale": 0.4593,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 1624.3589743589741,
-                "y": 624.3589743589743
+                "x": 1742.8695841497934,
+                "y": 424.5591116917048
             }
         },
         "/Users/vols/Projects/travel-the-world/assets/levels/level_2/longsword.tsx": {
@@ -102,15 +102,15 @@
     "project": "level_1.tiled-project",
     "property.type": "string",
     "recentFiles": [
-        "/Users/vols/Projects/travel-the-world/assets/levels/level_2/level_2.tmx",
-        "/Users/vols/Projects/travel-the-world/assets/levels/level_2/sand_64x32.tsx",
-        "/Users/vols/Projects/travel-the-world/assets/levels/level_2/grassland_tiles.tsx",
-        "/Users/vols/Projects/travel-the-world/assets/levels/level_2/house.tsx",
-        "/Users/vols/Projects/travel-the-world/assets/levels/level_2/tree.tsx",
-        "/Users/vols/Projects/travel-the-world/assets/levels/level_2/clothes.tsx",
-        "/Users/vols/Projects/travel-the-world/assets/levels/level_2/male_head1.tsx",
-        "/Users/vols/Projects/travel-the-world/assets/levels/level_2/shield.tsx",
         "/Users/vols/Projects/travel-the-world/assets/levels/level_2/longsword.tsx",
+        "/Users/vols/Projects/travel-the-world/assets/levels/level_2/shield.tsx",
+        "/Users/vols/Projects/travel-the-world/assets/levels/level_2/male_head1.tsx",
+        "/Users/vols/Projects/travel-the-world/assets/levels/level_2/clothes.tsx",
+        "/Users/vols/Projects/travel-the-world/assets/levels/level_2/tree.tsx",
+        "/Users/vols/Projects/travel-the-world/assets/levels/level_2/house.tsx",
+        "/Users/vols/Projects/travel-the-world/assets/levels/level_2/grassland_tiles.tsx",
+        "/Users/vols/Projects/travel-the-world/assets/levels/level_2/sand_64x32.tsx",
+        "/Users/vols/Projects/travel-the-world/assets/levels/level_2/level_2.tmx",
         "/Users/vols/Projects/travel-the-world/assets/levels/level_2/baseman.tsx",
         "/Users/vols/Projects/travel-the-world/assets/levels/level_2/tree_1.tsx",
         "/Users/vols/Projects/travel-the-world/assets/levels/level_2/dirt_128x64.tsx"

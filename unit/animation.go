@@ -2,9 +2,11 @@ package unit
 
 import (
 	"fmt"
+	"image"
 	"image/color"
 	"log"
 	"travel-the-world/assets"
+	"travel-the-world/camera"
 	"travel-the-world/tiles"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -53,33 +55,38 @@ func (u *Unit) ScreenY() float64 {
 	return u.action.animation.CTile.ScreenY()
 }
 
-func (u *Unit) Draw(screen *ebiten.Image, cameraX, cameraY float64) {
+func (u *Unit) Draw(screen *ebiten.Image, camera *camera.Camera, playerPos image.Point, radius int) {
 	if u.IsAlive() {
-		u.drawHealth(screen, cameraX, cameraY)
+		u.drawHealth(screen, camera)
 	}
-	u.action.animation.CTile.Draw(screen, cameraX, cameraY)
+	u.action.animation.CTile.Draw(screen, camera, playerPos, radius)
 }
 
-func (u *Unit) drawHealth(screen *ebiten.Image, cameraX, cameraY float64) {
-	lineLenght := 20
-	lineHeight := 60
-	x1 := u.Point().X - lineLenght/2 - int(cameraX)
+func (u *Unit) drawHealth(screen *ebiten.Image, c *camera.Camera) {
+	lineLenght := 20 * c.Scale
+	lineHeight := float64(60)
+	ux, uy := c.WorldToScreen(u.X, u.Y)
+	x1 := ux - lineLenght/2
 	x2 := x1 + lineLenght
-	y1 := u.Point().Y - lineHeight - int(cameraY)
+	y1 := uy - lineHeight*c.Scale
 	y2 := y1
-	vector.StrokeLine(screen, float32(x1), float32(y1), float32(x2), float32(y2), 2, color.RGBA{255, 0, 0, 255}, false)
 
-	cx2 := x1 + lineLenght*u.Stats.health/u.Stats.maxHealth
-	vector.StrokeLine(screen, float32(x1), float32(y1), float32(cx2), float32(y2), 2, color.RGBA{0, 255, 0, 255}, false)
+	weight := float32(2 * c.Scale)
+	vector.StrokeLine(screen, float32(x1), float32(y1), float32(x2), float32(y2), weight, color.RGBA{255, 0, 0, 255}, false)
+
+	cx2 := x1 + lineLenght*u.helthLeftInPercent()
+	vector.StrokeLine(screen, float32(x1), float32(y1), float32(cx2), float32(y2), weight, color.RGBA{0, 255, 0, 255}, false)
 
 	if u.highlight > 0 {
-		circleX := float32(u.X - cameraX)
-		circleY := float32(u.Y - cameraY)
-		r := float32(u.Rect().Size().X) * 0.6
-		vector.StrokeCircle(screen, circleX, circleY, r, 7, color.RGBA{200, 200, 0, 255}, false)
+		circleX := float32(ux) //float32((u.X - c.X) * c.Scale)
+		circleY := float32(uy) //float32((u.Y - c.Y) * c.Scale)
+		r := float32(u.Rect().Size().X) * 0.6 * float32(c.Scale)
+		weight := float32(7 * c.Scale)
+		vector.StrokeCircle(screen, circleX, circleY, r, weight, color.RGBA{200, 200, 0, 255}, false)
 		u.highlight--
 	}
 }
+
 func (u *Unit) Highlight() {
 	u.highlight = 3
 }

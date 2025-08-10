@@ -15,7 +15,7 @@ type Behavior interface {
 type PlayerBehavior struct{}
 
 func (b *PlayerBehavior) Update(u *Unit, worldCtx *world.Context) {
-	if u.ListenKeyBoard(worldCtx.CameraPos) {
+	if u.ListenKeyBoard(worldCtx.Camera) {
 		for _, obj := range worldCtx.InteractableList.Items {
 			if u.target.Point().In(obj.Rect()) {
 				if target, ok := obj.(common.Damagable); ok && target.IsAlive() && u.IsEnemy(target) {

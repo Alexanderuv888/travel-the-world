@@ -2,11 +2,11 @@ package level
 
 import (
 	"errors"
-	"image"
 	"log"
 	"math/rand/v2"
 	"path/filepath"
 	"travel-the-world/assets"
+	"travel-the-world/camera"
 	"travel-the-world/tiles"
 	"travel-the-world/unit"
 
@@ -63,8 +63,8 @@ func (l *Level) Size() (width, height int) {
 	return l.W, l.H
 }
 
-func (l *Level) AddObject(tx, ty float64, w, h int, img *ebiten.Image) {
-	l.Objects = append(l.Objects, tiles.NewObjectTile(tx, ty, w, h, img))
+func (l *Level) AddObject(tx, ty float64, img *ebiten.Image) {
+	l.Objects = append(l.Objects, tiles.NewObjectTile(tx, ty, img))
 }
 
 func (l *Level) CreateUnits(amount int) {
@@ -98,7 +98,7 @@ func (l *Level) drawIsoLayer(background *ebiten.Image, layer *tiled.Layer, ts *t
 			screenX := float64((x-y)*(l.TileW/2)+offsetX) + float64(l.W*l.TileW/2-l.TileW/2)
 			screenY := float64((x+y)*(l.TileH/2)+offsetY) + padding
 			if layer.Name == "tree" {
-				l.AddObject(screenX, screenY, l.TileW, l.TileH, tiles[tile.ID])
+				l.AddObject(screenX, screenY, tiles[tile.ID])
 			} else {
 				op := &ebiten.DrawImageOptions{}
 				op.GeoM.Translate(screenX, screenY)
@@ -108,17 +108,19 @@ func (l *Level) drawIsoLayer(background *ebiten.Image, layer *tiled.Layer, ts *t
 	}
 }
 
-func (l *Level) DrawLevel(screen *ebiten.Image, cameraPos image.Point) {
+func (l *Level) DrawLevel(screen *ebiten.Image, camera *camera.Camera) {
 	if l.needUpdate {
-		l.Update(cameraPos)
+		l.Update()
 		l.needUpdate = false
 	}
 	op := &ebiten.DrawImageOptions{}
-	op.GeoM.Translate(-float64(cameraPos.X), -float64(cameraPos.Y))
+
+	//op.GeoM.Translate(-float64(cameraPos.X), -float64(cameraPos.Y))
+	camera.Apply(op)
 	screen.DrawImage(l.background, op)
 }
 
-func (l *Level) Update(cameraPos image.Point) {
+func (l *Level) Update() {
 	for _, layer := range l.tmap.Layers {
 		if !layer.Visible {
 			continue

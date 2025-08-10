@@ -33,6 +33,10 @@ func NewStats(health, maxHealth, damage int, attackDisance, vision, speed float6
 		exp:                 0}
 }
 
+func (u *Unit) helthLeftInPercent() float64 {
+	return float64(u.Stats.health) / float64(u.Stats.maxHealth)
+}
+
 func (u *Unit) AddExp(exp int) {
 	s := u.Stats
 	u.Stats.exp += exp

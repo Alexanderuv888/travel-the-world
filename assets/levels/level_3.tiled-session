@@ -1,0 +1,87 @@
+{
+    "Map/SizeTest": {
+        "height": 4300,
+        "width": 2
+    },
+    "activeFile": "level_3/level_3.tmx",
+    "expandedProjectPaths": [
+        "level_3",
+        "."
+    ],
+    "file.lastUsedOpenFilter": "All Files (*)",
+    "fileStates": {
+        "level_3/building.tsx": {
+            "dynamicWrapping": false
+        },
+        "level_3/buildings.tsx": {
+            "dynamicWrapping": true,
+            "scaleInDock": 0.25,
+            "scaleInEditor": 0.2698
+        },
+        "level_3/clothes.tsx": {
+            "dynamicWrapping": false,
+            "scaleInDock": 0.25,
+            "scaleInEditor": 1
+        },
+        "level_3/grassland_tiles.tsx": {
+            "dynamicWrapping": false,
+            "scaleInDock": 0.25,
+            "scaleInEditor": 1
+        },
+        "level_3/landscape.tsx": {
+            "dynamicWrapping": true
+        },
+        "level_3/level_3.tmx": {
+            "scale": 0.4494,
+            "selectedLayer": 2,
+            "viewCenter": {
+                "x": 2970.6275033377833,
+                "y": 1163.7739207832665
+            }
+        },
+        "level_3/trees.tsx": {
+            "dynamicWrapping": true,
+            "scaleInDock": 0.25,
+            "scaleInEditor": 0.2578
+        },
+        "level_3/unit2.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "level_3/units.tsx": {
+            "dynamicWrapping": true,
+            "scaleInDock": 0.25,
+            "scaleInEditor": 0.2524
+        }
+    },
+    "last.imagePath": "/Users/vols/tiles/flare/tiles",
+    "map.height": 50,
+    "map.lastUsedFormat": "tmx",
+    "map.orientation": "3",
+    "map.tileWidth": 64,
+    "map.width": 50,
+    "openFiles": [
+        "level_3/level_3.tmx",
+        "level_3/grassland_tiles.tsx",
+        "level_3/trees.tsx",
+        "level_3/buildings.tsx",
+        "level_3/units.tsx",
+        "level_3/clothes.tsx"
+    ],
+    "project": "level_3.tiled-project",
+    "recentFiles": [
+        "level_3/units.tsx",
+        "level_3/buildings.tsx",
+        "level_3/clothes.tsx",
+        "level_3/trees.tsx",
+        "level_3/grassland_tiles.tsx",
+        "level_3/level_3.tmx",
+        "level_3/unit2.tsx"
+    ],
+    "tileset.lastUsedFormat": "tsx",
+    "tileset.tileSize": {
+        "height": 32,
+        "width": 64
+    },
+    "tileset.type": 1
+}

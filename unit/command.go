@@ -2,6 +2,7 @@ package unit
 
 import (
 	"image"
+	"travel-the-world/camera"
 	"travel-the-world/common"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -22,10 +23,11 @@ func (u *Unit) Command(command Command, target common.Target) {
 	u.target = target
 }
 
-func (u *Unit) ListenKeyBoard(cameraPos image.Point) bool {
+func (u *Unit) ListenKeyBoard(camera *camera.Camera) bool {
 	if ebiten.IsMouseButtonPressed(ebiten.MouseButton0) {
 		GoalX, GoalY := ebiten.CursorPosition()
-		u.MoveToPoint(image.Point{GoalX + cameraPos.X, GoalY + cameraPos.Y})
+
+		u.MoveToPoint(camera.ScreenToWorldPoint(GoalX, GoalY))
 
 		u.PlayConfirmSpeach()
 		return true

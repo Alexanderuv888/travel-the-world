@@ -1,6 +1,11 @@
 package tiles
 
-import "github.com/hajimehoshi/ebiten/v2"
+import (
+	"image"
+	"travel-the-world/camera"
+
+	"github.com/hajimehoshi/ebiten/v2"
+)
 
 type CompositeTile struct {
 	Sx, Sy float64
@@ -33,10 +38,10 @@ func (o *CompositeTile) ScreenY() float64 {
 	return o.Ty - float64(o.H)
 }
 
-func (o *CompositeTile) Draw(screen *ebiten.Image, cameraX, cameraY float64) {
+func (o *CompositeTile) Draw(screen *ebiten.Image, camera *camera.Camera, playerPos image.Point, radius int) {
 	op := &ebiten.DrawImageOptions{}
-	op.GeoM.Scale(o.Sx, o.Sy)
-	op.GeoM.Translate(o.Tx-cameraX, o.Ty-cameraY)
+	op.GeoM.Translate(o.Tx, o.Ty)
+	camera.Apply(op)
 	for _, img := range o.Images {
 		screen.DrawImage(img, op)
 	}

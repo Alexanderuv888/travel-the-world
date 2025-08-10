@@ -48,7 +48,7 @@ func NewGame() (*Game, error) {
 		ilist.Add(npc)
 	}
 
-	worldCtx := &world.Context{InteractableList: *ilist, CameraPos: camera.Pos()}
+	worldCtx := &world.Context{InteractableList: *ilist, Camera: camera}
 
 	g := &Game{
 		hud:           hud.NewHUD(unit),
@@ -64,7 +64,7 @@ func NewGame() (*Game, error) {
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-	g.CurrentLevel.DrawLevel(screen, g.WorldCtx.CameraPos)
+	g.CurrentLevel.DrawLevel(screen, g.Camera)
 	dq := &tiles.DrawQueue{}
 
 	for _, unit := range g.CurrentLevel.Units {
@@ -75,7 +75,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		dq.Add(obj)
 	}
 
-	dq.DrawAll(screen, g.Camera.X, g.Camera.Y)
+	dq.DrawAll(screen, g.Camera, g.Unit.Point(), int(g.Unit.Stats.Vision/2.5))
 	dq.Clear()
 	g.hud.Draw(screen)
 	g.drawDebugInfo(screen)
@@ -86,8 +86,8 @@ func (g *Game) drawDebugInfo(screen *ebiten.Image) {
 	mouseX, mouseY := ebiten.CursorPosition()
 	ebitenutil.DebugPrint(screen, fmt.Sprintf("KEYS WASD EC R\nFPS  %0.0f\nTPS  %0.0f\nangle  %0.2f\ntopAngle  %0.2f\nbottomAngle  %0.2f\nUnitPOS  %0.0f,%0.0f\nmousePOS  %0.0f,%0.0f", ebiten.ActualFPS(), ebiten.ActualTPS(), g.Unit.Angle, g.Unit.TopAngle, g.Unit.BottomAngle, g.Unit.X, g.Unit.Y, float64(mouseX)+g.Camera.X, float64(mouseY)+g.Camera.Y))
 
-	x1, y1 := g.Unit.X-g.Camera.X, g.Unit.Y-g.Camera.Y             //WorldToIso(g.Unit.X, g.Unit.Y, 64, 32, g.Camera.X, g.Camera.Y)
-	x2, y2 := g.Unit.GoalX()-g.Camera.X, g.Unit.GoalY()-g.Camera.Y //WorldToIso(g.Unit.GoalX, g.Unit.GoalY, 64, 32, g.Camera.X, g.Camera.Y)
+	x1, y1 := g.Camera.WorldToScreen(g.Unit.X, g.Unit.Y)             //WorldToIso(g.Unit.X, g.Unit.Y, 64, 32, g.Camera.X, g.Camera.Y)
+	x2, y2 := g.Camera.WorldToScreen(g.Unit.GoalX(), g.Unit.GoalY()) //WorldToIso(g.Unit.GoalX, g.Unit.GoalY, 64, 32, g.Camera.X, g.Camera.Y)
 	vector.StrokeLine(screen, float32(x1), float32(y1), float32(x2), float32(y2), 1, color.RGBA{255, 0, 0, 255}, false)
 }
 
@@ -98,7 +98,7 @@ func (g *Game) Layout(screenWidth, screenHeight int) (int, int) {
 func (g *Game) Update() error {
 	g.listenKeyBoardAndMouse()
 	ilist := unitToIntarectableList(g.CurrentLevel.Units)
-	g.WorldCtx.Update(g.Camera.Pos(), ilist)
+	g.WorldCtx.Update(ilist)
 	levelDimentions := image.Point{g.CurrentLevel.WidthInt(), g.CurrentLevel.HeightInt()}
 
 	for _, unit := range g.CurrentLevel.Units {
@@ -108,10 +108,10 @@ func (g *Game) Update() error {
 }
 
 func (g *Game) listenKeyBoardAndMouse() {
-	g.Camera.Update()
+	c := g.Camera
+	c.Update()
 	x, y := ebiten.CursorPosition()
-
-	p := image.Point{x + g.Camera.Pos().X, y + g.Camera.Pos().Y}
+	p := c.ScreenToWorldPoint(x, y)
 	for _, obj := range g.WorldCtx.InteractableList.Items {
 		if p.In(obj.Rect()) {
 			obj.Highlight()
