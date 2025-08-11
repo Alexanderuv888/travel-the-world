@@ -20,6 +20,7 @@ import (
 )
 
 type Game struct {
+	state         GameState
 	AssetsManager *assets.Manager
 	CurrentLevel  *level.Level
 	WorldCtx      *world.Context
@@ -51,6 +52,7 @@ func NewGame() (*Game, error) {
 	worldCtx := &world.Context{InteractableList: *ilist, Camera: camera}
 
 	g := &Game{
+		state:         StateMenu,
 		hud:           hud.NewHUD(unit),
 		AssetsManager: assetsManager,
 		CurrentLevel:  l,
@@ -63,7 +65,7 @@ func NewGame() (*Game, error) {
 	return g, nil
 }
 
-func (g *Game) Draw(screen *ebiten.Image) {
+func (g *Game) DrawGame(screen *ebiten.Image) {
 	g.CurrentLevel.DrawLevel(screen, g.Camera)
 	dq := &tiles.DrawQueue{}
 
@@ -95,7 +97,7 @@ func (g *Game) Layout(screenWidth, screenHeight int) (int, int) {
 	return screenWidth, screenHeight
 }
 
-func (g *Game) Update() error {
+func (g *Game) UpdateGame() error {
 	g.listenKeyBoardAndMouse()
 	ilist := unitToIntarectableList(g.CurrentLevel.Units)
 	g.WorldCtx.Update(ilist)
