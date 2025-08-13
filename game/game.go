@@ -11,6 +11,7 @@ import (
 	"travel-the-world/hud"
 	"travel-the-world/level"
 	"travel-the-world/tiles"
+	"travel-the-world/ui"
 	"travel-the-world/unit"
 	"travel-the-world/world"
 
@@ -21,6 +22,7 @@ import (
 
 type Game struct {
 	state         GameState
+	Menu          *ui.Menu
 	AssetsManager *assets.Manager
 	CurrentLevel  *level.Level
 	WorldCtx      *world.Context
@@ -33,6 +35,9 @@ type Game struct {
 }
 
 func NewGame() (*Game, error) {
+
+	menu := ui.NewMenu()
+
 	assetsManager := assets.NewManager()
 
 	l, err := level.NewLevel("level_2", assetsManager)
@@ -53,6 +58,7 @@ func NewGame() (*Game, error) {
 
 	g := &Game{
 		state:         StateMenu,
+		Menu:          menu,
 		hud:           hud.NewHUD(unit),
 		AssetsManager: assetsManager,
 		CurrentLevel:  l,
@@ -62,6 +68,13 @@ func NewGame() (*Game, error) {
 		mousePanX:     math.MinInt32,
 		mousePanY:     math.MinInt32,
 	}
+	menu.SetStartCallback(func() {
+		g.state = StatePlaying
+	})
+
+	menu.SetExitCallback(func() {
+		g.state = StateQuitGame
+	})
 	return g, nil
 }
 
@@ -118,6 +131,9 @@ func (g *Game) listenKeyBoardAndMouse() {
 		if p.In(obj.Rect()) {
 			obj.Highlight()
 		}
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyEscape) {
+		g.state = StateMenu
 	}
 }
 

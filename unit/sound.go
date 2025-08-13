@@ -76,11 +76,11 @@ func (u *Unit) play(path string, volume float64) {
 }
 
 func (u *Unit) PlayConfirmSpeach() {
-	playSound(u.sound.confirmSpeechPool, 1)
+	playSound(u.sound.confirmSpeechPool, 0.1)
 }
 
 func (u *Unit) playSwordAttack() {
-	playSound(u.sound.attackSwordPool, 0.2)
+	playSound(u.sound.attackSwordPool, 0.1)
 }
 
 func playSound(pool []*audio.Player, volume float64) {
