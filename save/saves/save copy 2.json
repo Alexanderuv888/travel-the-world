@@ -1,0 +1,15 @@
+{
+  "Health": 14,
+  "MaxHealth": 22,
+  "HealthSpeedRecover": 1000,
+  "Stamina": 6,
+  "MaxStamina": 11,
+  "StaminaSpeedRecover": 1000,
+  "damage": 7,
+  "AttackDistance": 50,
+  "Vision": 350,
+  "Speed": 1.5,
+  "Level": 6,
+  "MaxExp": 882,
+  "Exp": 446
+}

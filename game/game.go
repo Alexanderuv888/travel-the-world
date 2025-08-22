@@ -26,7 +26,7 @@ type Game struct {
 	AssetsManager *assets.Manager
 	CurrentLevel  *level.Level
 	WorldCtx      *world.Context
-	Unit          *unit.Unit
+	Player        *unit.Unit
 	hud           *hud.HUD
 
 	Camera *camera.Camera
@@ -35,9 +35,7 @@ type Game struct {
 }
 
 func NewGame() (*Game, error) {
-
 	menu := ui.NewMenu()
-
 	assetsManager := assets.NewManager()
 
 	l, err := level.NewLevel("level_2", assetsManager)
@@ -63,7 +61,7 @@ func NewGame() (*Game, error) {
 		AssetsManager: assetsManager,
 		CurrentLevel:  l,
 		WorldCtx:      worldCtx,
-		Unit:          unit,
+		Player:        unit,
 		Camera:        camera,
 		mousePanX:     math.MinInt32,
 		mousePanY:     math.MinInt32,
@@ -74,6 +72,24 @@ func NewGame() (*Game, error) {
 
 	menu.SetExitCallback(func() {
 		g.state = StateQuitGame
+	})
+	menu.SetLoadGameCallback(func() {
+		/*g.LoadProgress()
+		g.state = StatePlaying*/
+		//g.Menu.Sfll.Visible = true
+	})
+	menu.SetSaveGameCallback(func() {
+		menu.SaveMenu.LoadFiles()
+		menu.SaveMenu.Visible = true
+	})
+	ui.SetSaveHandler(func(name string) {
+		// формируем путь, например save/saves/<name>.json
+		path := "save/saves/" + name
+		// если хотите добавлять расширение:
+		// if !strings.HasSuffix(path, ".json") { path += ".json" }
+		g.SaveProgress(path)
+		// обновить список файлов в меню, если меню открыто:
+		menu.SaveMenu.LoadFiles()
 	})
 	return g, nil
 }
@@ -90,7 +106,7 @@ func (g *Game) DrawGame(screen *ebiten.Image) {
 		dq.Add(obj)
 	}
 
-	dq.DrawAll(screen, g.Camera, g.Unit.Point(), int(g.Unit.Stats.Vision/2.5))
+	dq.DrawAll(screen, g.Camera, g.Player.Point(), int(g.Player.Stats.Vision/2.5))
 	dq.Clear()
 	g.hud.Draw(screen)
 	g.drawDebugInfo(screen)
@@ -99,10 +115,10 @@ func (g *Game) DrawGame(screen *ebiten.Image) {
 
 func (g *Game) drawDebugInfo(screen *ebiten.Image) {
 	mouseX, mouseY := ebiten.CursorPosition()
-	ebitenutil.DebugPrint(screen, fmt.Sprintf("KEYS WASD EC R\nFPS  %0.0f\nTPS  %0.0f\nangle  %0.2f\ntopAngle  %0.2f\nbottomAngle  %0.2f\nUnitPOS  %0.0f,%0.0f\nmousePOS  %0.0f,%0.0f", ebiten.ActualFPS(), ebiten.ActualTPS(), g.Unit.Angle, g.Unit.TopAngle, g.Unit.BottomAngle, g.Unit.X, g.Unit.Y, float64(mouseX)+g.Camera.X, float64(mouseY)+g.Camera.Y))
+	ebitenutil.DebugPrint(screen, fmt.Sprintf("KEYS WASD EC R\nFPS  %0.0f\nTPS  %0.0f\nangle  %0.2f\ntopAngle  %0.2f\nbottomAngle  %0.2f\nUnitPOS  %0.0f,%0.0f\nmousePOS  %0.0f,%0.0f", ebiten.ActualFPS(), ebiten.ActualTPS(), g.Player.Angle, g.Player.TopAngle, g.Player.BottomAngle, g.Player.X, g.Player.Y, float64(mouseX)+g.Camera.X, float64(mouseY)+g.Camera.Y))
 
-	x1, y1 := g.Camera.WorldToScreen(g.Unit.X, g.Unit.Y)             //WorldToIso(g.Unit.X, g.Unit.Y, 64, 32, g.Camera.X, g.Camera.Y)
-	x2, y2 := g.Camera.WorldToScreen(g.Unit.GoalX(), g.Unit.GoalY()) //WorldToIso(g.Unit.GoalX, g.Unit.GoalY, 64, 32, g.Camera.X, g.Camera.Y)
+	x1, y1 := g.Camera.WorldToScreen(g.Player.X, g.Player.Y)             //WorldToIso(g.Player.X, g.Player.Y, 64, 32, g.Camera.X, g.Camera.Y)
+	x2, y2 := g.Camera.WorldToScreen(g.Player.GoalX(), g.Player.GoalY()) //WorldToIso(g.Player.GoalX, g.Player.GoalY, 64, 32, g.Camera.X, g.Camera.Y)
 	vector.StrokeLine(screen, float32(x1), float32(y1), float32(x2), float32(y2), 1, color.RGBA{255, 0, 0, 255}, false)
 }
 

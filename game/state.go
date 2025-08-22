@@ -42,7 +42,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 }
 
 // Вспомогательная функция для рисования текста
-func drawText(screen *ebiten.Image, str string, x, y int, clr color.Color) {
+func DrawText(screen *ebiten.Image, str string, x, y int, clr color.Color) {
 	op := &text.DrawOptions{}
 	op.GeoM.Translate(float64(x), float64(y))
 	op.ColorScale.ScaleWithColor(clr)

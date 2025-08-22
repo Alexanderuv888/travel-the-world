@@ -36,7 +36,6 @@ func (o *ObjectTile) ScreenY() float64 {
 
 func (o *ObjectTile) Draw(screen *ebiten.Image, camera *camera.Camera, playerPos image.Point, radius int) {
 	op := &ebiten.DrawImageOptions{}
-	//op.GeoM.Scale(o.Sx, o.Sy)
 	op.GeoM.Translate(o.Tx, o.Ty)
 	camera.Apply(op)
 	alpha := 1.0
