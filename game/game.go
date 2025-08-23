@@ -74,6 +74,9 @@ func NewGame() (*Game, error) {
 		g.state = StateQuitGame
 	})
 	menu.SetLoadGameCallback(func() {
+		menu.SaveLoadMenu.SetFiles(ui.LoadSaveFiles())
+		menu.SaveLoadMenu.SetVisible(true)
+		menu.SaveMenu.Visible = false
 		/*g.LoadProgress()
 		g.state = StatePlaying*/
 		//g.Menu.Sfll.Visible = true
@@ -81,6 +84,7 @@ func NewGame() (*Game, error) {
 	menu.SetSaveGameCallback(func() {
 		menu.SaveMenu.LoadFiles()
 		menu.SaveMenu.Visible = true
+		menu.SaveLoadMenu.SetVisible(false)
 	})
 	ui.SetSaveHandler(func(name string) {
 		// формируем путь, например save/saves/<name>.json

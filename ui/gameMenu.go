@@ -8,7 +8,8 @@ type Menu struct {
 	Buttons []*Button
 	//Sfll    *SaveFilesListLayout
 	//SavesTable *Table
-	SaveMenu SaveMenu
+	SaveMenu     SaveMenu
+	SaveLoadMenu SaveLoadMenu
 }
 
 func NewMenu() *Menu {
@@ -36,8 +37,9 @@ func NewMenu() *Menu {
 		}
 	})
 	saveMenu := NewSaveMenu(450, 100, int(wfloat/2), int(hfloat/3))
+	saveLoadMenu := NewSaveLoadMenu(450, 100, int(wfloat/2), int(hfloat/3))
 
-	m := &Menu{Buttons: []*Button{startGameBtn, loadGameBtn, saveGameBtn, exitBtn}, SaveMenu: *saveMenu}
+	m := &Menu{Buttons: []*Button{startGameBtn, loadGameBtn, saveGameBtn, exitBtn}, SaveMenu: *saveMenu, SaveLoadMenu: *saveLoadMenu}
 	m.SaveMenu.initCallBackFunckions()
 	return m
 }
@@ -70,6 +72,7 @@ func (m *Menu) Update() {
 		b.Update()
 	}
 	m.SaveMenu.Update()
+	m.SaveLoadMenu.Update()
 }
 
 func (m *Menu) Draw(screen *ebiten.Image) {
@@ -77,4 +80,5 @@ func (m *Menu) Draw(screen *ebiten.Image) {
 		b.Draw(screen)
 	}
 	m.SaveMenu.Draw(screen)
+	m.SaveLoadMenu.Draw(screen)
 }

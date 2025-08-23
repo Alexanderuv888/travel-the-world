@@ -14,11 +14,7 @@ type SaveFile struct {
 	ModTime time.Time
 }
 
-func (m *SaveMenu) LoadFiles() {
-	m.files = loadFiles()
-}
-
-func loadFiles() (files []SaveFile) {
+func LoadSaveFiles() (files []SaveFile) {
 	entries, _ := os.ReadDir("save/saves")
 	for _, e := range entries {
 		if !e.IsDir() {
@@ -34,9 +30,4 @@ func loadFiles() (files []SaveFile) {
 		return files[i].ModTime.After(files[j].ModTime)
 	})
 	return
-}
-
-func NewSaveFilesList() []SaveFile {
-	return loadFiles()
-
 }

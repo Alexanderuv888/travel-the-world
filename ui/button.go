@@ -2,6 +2,7 @@ package ui
 
 import (
 	"image/color"
+	text "travel-the-world/ui/text"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
@@ -51,7 +52,7 @@ func (b *Button) Draw(screen *ebiten.Image) {
 	sub := ebiten.NewImage(b.Width, b.Height)
 	sub.Fill(clr)
 
-	DrawText(sub, b.Text, color.White, 24, 5, Center)
+	text.DrawText(sub, b.Text, color.White, 24, 5, text.Center)
 
 	op := &ebiten.DrawImageOptions{}
 	op.GeoM.Translate(float64(b.X), float64(b.Y))

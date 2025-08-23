@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	text "travel-the-world/ui/text"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
@@ -64,7 +65,7 @@ func (m *SaveMenu) initCallBackFunckions() {
 			return
 		}
 		// Обновляем список файлов и сбрасываем индексы
-		m.files = NewSaveFilesList()
+		m.files = LoadSaveFiles()
 		m.selectedIndex = -1
 		m.hoverIndex = -1
 	}
@@ -94,7 +95,7 @@ func NewSaveMenu(X, Y, Width, Height int) *SaveMenu {
 	}
 
 	// Загружаем список файлов сохранений
-	m.files = NewSaveFilesList()
+	m.files = LoadSaveFiles()
 
 	// Кнопки
 	m.btnNewSave = NewButton(m.X+m.Width-40-450, m.Y+m.Height+10, 150, 40, "New save", func() {
@@ -118,6 +119,10 @@ func NewSaveMenu(X, Y, Width, Height int) *SaveMenu {
 	})
 
 	return m
+}
+
+func (m *SaveMenu) LoadFiles() {
+	m.files = LoadSaveFiles()
 }
 
 // Экспортируем регистратор обработчика сохранения
@@ -194,8 +199,8 @@ func (m *SaveMenu) Draw(screen *ebiten.Image) {
 		sub := ebiten.NewImage(dst.Bounds().Dx()-10, 30)
 		sub.Fill(clr)
 
-		DrawText(sub, file.Name, color.White, 20, 5, Left)
-		DrawText(sub, file.ModTime.Format("2006-01-02 15:04"), color.White, 20, 5, Right)
+		text.DrawText(sub, file.Name, color.White, 20, 5, text.Left)
+		text.DrawText(sub, file.ModTime.Format("2006-01-02 15:04"), color.White, 20, 5, text.Right)
 
 		op := &ebiten.DrawImageOptions{}
 		op.GeoM.Translate(5, rowY)
@@ -223,14 +228,14 @@ func (m *SaveMenu) Draw(screen *ebiten.Image) {
 		row1.Fill(clr1)
 		op1 := &ebiten.DrawImageOptions{}
 		op1.GeoM.Translate(float64(m.X+m.Width/2-150+5), float64(m.Y+m.Height/2-60+20))
-		DrawText(row1, "Enter save name:", color.White, 10, 5, Right)
+		text.DrawText(row1, "Enter save name:", color.White, 10, 5, text.Right)
 		screen.DrawImage(row1, op1)
 
 		row2 := ebiten.NewImage(290, 32)
 		row2.Fill(clr)
 		op2 := &ebiten.DrawImageOptions{}
 		op2.GeoM.Translate(float64(m.X+m.Width/2-150+5), float64(m.Y+m.Height/2-60+40))
-		DrawText(row2, m.newSaveName, color.RGBA{200, 200, 200, 255}, 20, 5, Right)
+		text.DrawText(row2, m.newSaveName, color.RGBA{200, 200, 200, 255}, 20, 5, text.Right)
 		screen.DrawImage(row2, op2)
 
 		m.btnOk.Draw(screen)
