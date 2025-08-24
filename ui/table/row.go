@@ -10,7 +10,7 @@ type Row struct {
 	X, Y, Width, Height int
 	d                   image.Rectangle
 	Cells               []*Cell
-	Style               *Style
+	Style               Style
 	Hovered             bool
 	Selected            bool
 }
@@ -33,7 +33,6 @@ func (r *Row) Update() {
 	for _, cell := range r.Cells {
 		cell.Hovered = r.Hovered
 		cell.Selected = r.Selected
-		cell.Update()
 	}
 }
 

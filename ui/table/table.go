@@ -12,7 +12,7 @@ type Table struct {
 	Headers             []string
 	Rows                []*Row
 	D                   image.Rectangle
-	Style               *Style
+	Style               Style
 	selectedRowIndex    int
 	visible             bool // Добавлено поле для видимости таблицы
 }
@@ -21,7 +21,7 @@ func (t *Table) SetVisible(visible bool) {
 	t.visible = visible
 }
 
-func (t *Table) SetStyle(style *Style) {
+func (t *Table) SetStyle(style Style) {
 	t.Style = style
 	for i := range t.Rows {
 		t.Rows[i].Style = style

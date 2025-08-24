@@ -15,14 +15,12 @@ type SaveLoadMenu struct {
 	buttons             []*Button
 	files               []SaveFile
 	selectedIndex       int
-	hoverIndex          int
 	visible             bool
 }
 
 func NewSaveLoadMenu(X, Y, Width, Height int) *SaveLoadMenu {
 	m := &SaveLoadMenu{
 		selectedIndex: -1,
-		hoverIndex:    -1,
 		X:             X,
 		Y:             Y,
 		Width:         Width,
@@ -53,12 +51,10 @@ func (m *SaveLoadMenu) SetFiles(files []SaveFile) {
 		date := file.ModTime.Format("2006-01-02 15:04")
 		dateWidth := m.table.Width / 4
 		nameWidth := m.table.Width - dateWidth
-		height := m.table.Style.GetTextSize() + 10
-		style := table.DefaultStyle()
-		style.TextAlign = text.Right
+		height := m.table.Style.GetTextSize() + 15
 		nameCell := table.NewCell(nameWidth, height, name, m.table.Style)
-		dateCell := table.NewCell(dateWidth, height, date, style)
-
+		dateCell := table.NewCell(dateWidth, height, date, m.table.Style)
+		dateCell.SetAlign(text.Right)
 		m.table.AddRow(table.NewRow(nameCell, dateCell))
 	}
 }
