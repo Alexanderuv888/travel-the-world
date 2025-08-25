@@ -14,28 +14,41 @@ type Button struct {
 	Width    int
 	Height   int
 	pressed  bool
+	hovered  bool
 	Callback func()
+	invoke   *func()
 }
 
-func NewButton(x, y, width, height int, s string, colbacl func()) *Button {
-	return &Button{
-		Text:     s,
-		X:        x,
-		Y:        y,
-		Width:    width,
-		Height:   height,
-		Callback: colbacl,
+func DefButton(s string, invoke *func()) *Button {
+	return NewButton(0, 0, 150, 40, s, invoke)
+}
+
+func NewButton(X, Y, Width, Height int, s string, invoke *func()) *Button {
+
+	b := &Button{
+		Text:   s,
+		X:      X,
+		Y:      Y,
+		Width:  150,
+		Height: 40,
+		invoke: invoke,
 	}
+	b.Callback = func() {
+		if b.invoke != nil {
+			(*b.invoke)()
+		}
+	}
+	return b
 }
 
 func (b *Button) Update() {
-	if !b.isHovered() {
+	if !b.hovered {
 		b.pressed = false
 	}
-	if b.isHovered() && inpututil.IsMouseButtonJustPressed(ebiten.MouseButton0) {
+	if b.hovered && inpututil.IsMouseButtonJustPressed(ebiten.MouseButton0) {
 		b.pressed = true
 	}
-	if b.isHovered() && inpututil.IsMouseButtonJustReleased(ebiten.MouseButton0) {
+	if b.hovered && inpututil.IsMouseButtonJustReleased(ebiten.MouseButton0) {
 		b.Callback()
 		b.pressed = false
 	}
@@ -43,7 +56,7 @@ func (b *Button) Update() {
 
 func (b *Button) Draw(screen *ebiten.Image) {
 	clr := color.RGBA{100, 100, 100, 255}
-	if b.isHovered() {
+	if b.hovered {
 		clr = color.RGBA{150, 150, 150, 255}
 	}
 	if b.pressed {
@@ -59,7 +72,7 @@ func (b *Button) Draw(screen *ebiten.Image) {
 	screen.DrawImage(sub, op)
 }
 
-func (b *Button) isHovered() bool {
-	x, y := ebiten.CursorPosition()
-	return x >= b.X && x <= b.X+b.Width && y >= b.Y && y <= b.Y+b.Height
+func (b *Button) isHovered(x, y int) bool {
+	b.hovered = x >= b.X && x <= b.X+b.Width && y >= b.Y && y <= b.Y+b.Height
+	return b.hovered
 }

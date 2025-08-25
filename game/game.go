@@ -76,17 +76,15 @@ func NewGame() (*Game, error) {
 	menu.SetLoadGameCallback(func() {
 		menu.SaveLoadMenu.SetFiles(ui.LoadSaveFiles())
 		menu.SaveLoadMenu.SetVisible(true)
+		menu.SaveLoadMenu.SetButtons(ui.LoadMenuButtons)
 		menu.SaveMenu.Visible = false
-		/*g.LoadProgress()
-		g.state = StatePlaying*/
-		//g.Menu.Sfll.Visible = true
 	})
 	menu.SetSaveGameCallback(func() {
 		menu.SaveMenu.LoadFiles()
 		menu.SaveMenu.Visible = true
 		menu.SaveLoadMenu.SetVisible(false)
 	})
-	ui.SetSaveHandler(func(name string) {
+	ui.SetSaveGameHandler(func(name string) {
 		// формируем путь, например save/saves/<name>.json
 		path := "save/saves/" + name
 		// если хотите добавлять расширение:

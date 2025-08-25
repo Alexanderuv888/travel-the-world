@@ -29,27 +29,19 @@ type SaveMenu struct {
 	btnCancel         *Button
 }
 
-// обработчик сохранения - его нужно зарегистрировать снаружи (game.SaveProgress)
-var SaveHandler func(filename string)
-
-var (
-	onNewSave   func()
-	onOverwrite func()
-	onDelete    func()
-	onOkBtn     func()
-	onCancelBtn func()
-)
-
 func (m *SaveMenu) initCallBackFunckions() {
-	onNewSave = func() {
+	onNewSave = new(func())
+	*onNewSave = func() {
 		m.ShowNewSaveDialog = true
 	}
-	onOverwrite = func() {
-		if m.selectedIndex >= 0 && SaveHandler != nil {
-			SaveHandler(m.files[m.selectedIndex].Name)
+	onOverwrite = new(func())
+	*onOverwrite = func() {
+		if m.selectedIndex >= 0 && SaveGameHandler != nil {
+			SaveGameHandler(m.files[m.selectedIndex].Name)
 		}
 	}
-	onDelete = func() {
+	onDelete = new(func())
+	*onDelete = func() {
 		if m.selectedIndex < 0 {
 			return
 		}
@@ -69,16 +61,18 @@ func (m *SaveMenu) initCallBackFunckions() {
 		m.selectedIndex = -1
 		m.hoverIndex = -1
 	}
-	onOkBtn = func() {
+	onOkBtn = new(func())
+	*onOkBtn = func() {
 		if m.newSaveName != "" {
-			if SaveHandler != nil {
-				SaveHandler(m.newSaveName)
+			if SaveGameHandler != nil {
+				SaveGameHandler(m.newSaveName)
 			}
 			m.ShowNewSaveDialog = false
 			m.newSaveName = ""
 		}
 	}
-	onCancelBtn = func() {
+	onCancelBtn = new(func())
+	*onCancelBtn = func() {
 		m.ShowNewSaveDialog = false
 		m.newSaveName = ""
 	}
@@ -98,36 +92,20 @@ func NewSaveMenu(X, Y, Width, Height int) *SaveMenu {
 	m.files = LoadSaveFiles()
 
 	// Кнопки
-	m.btnNewSave = NewButton(m.X+m.Width-40-450, m.Y+m.Height+10, 150, 40, "New save", func() {
-		if onNewSave != nil {
-			onNewSave()
-		}
-	})
-	m.btnOverwrite = NewButton(m.X+m.Width-20-300, m.Y+m.Height+10, 150, 40, "Overwrite", func() {
-		onOverwrite()
-	})
-	m.btnDelete = NewButton(m.X+m.Width-150, m.Y+m.Height+10, 150, 40, "Delete", func() {
-		onDelete()
-	})
+	m.btnNewSave = NewButton(m.X+m.Width-40-450, m.Y+m.Height+10, 150, 40, "New save", onNewSave)
+
+	m.btnOverwrite = NewButton(m.X+m.Width-20-300, m.Y+m.Height+10, 150, 40, "Overwrite", onOverwrite)
+	m.btnDelete = NewButton(m.X+m.Width-150, m.Y+m.Height+10, 150, 40, "Delete", onDelete)
 
 	// Кнопки диалога
-	m.btnOk = NewButton(m.X+m.Width/2-150+5, m.Y+m.Height/2-60+80, 80, 30, "OK", func() {
-		onOkBtn()
-	})
-	m.btnCancel = NewButton(m.X+m.Width/2-50+5, m.Y+m.Height/2-60+80, 80, 30, "Cancel", func() {
-		onCancelBtn()
-	})
+	m.btnOk = NewButton(m.X+m.Width/2-150+5, m.Y+m.Height/2-60+80, 80, 30, "OK", onOkBtn)
+	m.btnCancel = NewButton(m.X+m.Width/2-50+5, m.Y+m.Height/2-60+80, 80, 30, "Cancel", onCancelBtn)
 
 	return m
 }
 
 func (m *SaveMenu) LoadFiles() {
 	m.files = LoadSaveFiles()
-}
-
-// Экспортируем регистратор обработчика сохранения
-func SetSaveHandler(cb func(filename string)) {
-	SaveHandler = cb
 }
 
 func (m *SaveMenu) Update() {

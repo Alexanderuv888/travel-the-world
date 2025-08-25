@@ -1,7 +1,6 @@
 package ui
 
 import (
-	"image/color"
 	"travel-the-world/ui/table"
 
 	text "travel-the-world/ui/text"
@@ -12,41 +11,37 @@ import (
 type SaveLoadMenu struct {
 	X, Y, Width, Height int
 	table               *table.Table
-	buttons             []*Button
-	files               []SaveFile
-	selectedIndex       int
+	buttonsBar          *ButtonsBar
 	visible             bool
+	ShowNewSaveDialog   bool
+	newSaveName         string
 }
 
 func NewSaveLoadMenu(X, Y, Width, Height int) *SaveLoadMenu {
 	m := &SaveLoadMenu{
-		selectedIndex: -1,
-		X:             X,
-		Y:             Y,
-		Width:         Width,
-		Height:        Height,
+		X:      X,
+		Y:      Y,
+		Width:  Width,
+		Height: Height,
 	}
-	m.table = &table.Table{
-		X:      X + 5,
-		Y:      Y + 5,
-		Width:  Width - 10,
-		Height: Height - 200,
-	}
-	m.table.SetStyle(table.DefaultStyle())
-	m.files = LoadSaveFiles()
-
+	m.table = table.NewTable(X+5, Y+5, Width-10, Height-200)
+	m.buttonsBar = NewButtonsBar(X+5, Y+Height-200, Width-10, 200)
+	m.buttonsBar.SetOrientation(OrientHorizontal)
+	m.buttonsBar.SetAlignment(AlignRight)
+	m.buttonsBar.SetPadding(10)
+	m.buttonsBar.SetSpacing(10)
 	return m
 }
 
 func (m *SaveLoadMenu) SetVisible(val bool) {
 	m.visible = val
 	m.table.SetVisible(val)
+	m.buttonsBar.SetVisible(val)
 }
 
 func (m *SaveLoadMenu) SetFiles(files []SaveFile) {
-	m.files = files
 	m.table.Rows = nil
-	for _, file := range m.files {
+	for _, file := range files {
 		name := file.Name
 		date := file.ModTime.Format("2006-01-02 15:04")
 		dateWidth := m.table.Width / 4
@@ -59,8 +54,25 @@ func (m *SaveLoadMenu) SetFiles(files []SaveFile) {
 	}
 }
 
-func (m *SaveLoadMenu) SetButtons(buttons ...*Button) {
-	m.buttons = buttons
+func (m *SaveLoadMenu) selectedFileName() string {
+
+	if m.selectedIndex() >= 0 && m.selectedIndex() < len(m.table.Rows) {
+		return m.table.Rows[m.selectedIndex()].Cells[0].Content
+	}
+	return ""
+
+}
+
+func (m *SaveLoadMenu) selectedIndex() int {
+	return m.table.SelectedRowIndex()
+}
+
+func (m *SaveLoadMenu) resetIndex() {
+	m.table.ResetRowIndex()
+}
+
+func (m *SaveLoadMenu) SetButtons(buttons []*Button) {
+	m.buttonsBar.SetButtons(buttons)
 }
 
 func (m *SaveLoadMenu) Update() {
@@ -68,27 +80,14 @@ func (m *SaveLoadMenu) Update() {
 		return
 	}
 	m.table.Update()
-	for _, btn := range m.buttons {
-		btn.Update()
-	}
+	m.buttonsBar.Update()
 }
 
 func (m *SaveLoadMenu) Draw(screen *ebiten.Image) {
 	if !m.visible {
 		return
 	}
+	m.table.Draw(screen)
 
-	clr := color.RGBA{50, 50, 50, 255}
-
-	dst := ebiten.NewImage(m.Width, m.Height)
-	dst.Fill(clr)
-
-	dstOp := &ebiten.DrawImageOptions{}
-	dstOp.GeoM.Translate(float64(m.X), float64(m.Y))
-	m.table.Draw(dst)
-	for _, btn := range m.buttons {
-		btn.Draw(dst)
-	}
-
-	screen.DrawImage(dst, dstOp)
+	m.buttonsBar.Draw(screen)
 }
