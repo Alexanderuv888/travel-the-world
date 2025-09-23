@@ -164,9 +164,6 @@ func (g *Game) listenKeyBoardAndMouse() {
 			obj.Highlight()
 		}
 	}
-	if ebiten.IsKeyPressed(ebiten.KeyEscape) {
-		g.state = StateMenu
-	}
 }
 
 func WorldToScreenIso(x, y float64, tileW, tileH int, cameraX, cameraY float64) (float64, float64) {

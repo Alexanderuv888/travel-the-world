@@ -6,6 +6,7 @@ import (
 	"log"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/hajimehoshi/ebiten/v2/text/v2"
 	"golang.org/x/image/font/gofont/goregular"
 )
@@ -21,6 +22,7 @@ const (
 )
 
 func (g *Game) Update() error {
+	g.updateState()
 	switch g.state {
 	case StateMenu:
 		g.Menu.Update()
@@ -62,4 +64,14 @@ func DrawText(screen *ebiten.Image, str string, x, y int, clr color.Color) {
 		&face,  // интерфейс Face, описывающий шрифт
 		op,     // опции рисования, например центровка
 	)
+}
+
+func (g *Game) updateState() {
+	if inpututil.IsKeyJustReleased(ebiten.KeyEscape) {
+		if g.state == StatePlaying {
+			g.state = StateMenu
+		} else {
+			g.state = StatePlaying
+		}
+	}
 }
