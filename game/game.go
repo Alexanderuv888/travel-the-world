@@ -10,6 +10,7 @@ import (
 	"travel-the-world/common"
 	"travel-the-world/hud"
 	"travel-the-world/level"
+	"travel-the-world/save"
 	"travel-the-world/tiles"
 	"travel-the-world/ui"
 	"travel-the-world/unit"
@@ -77,12 +78,25 @@ func NewGame() (*Game, error) {
 		menu.SaveLoadMenu.SetFiles(ui.LoadSaveFiles())
 		menu.SaveLoadMenu.SetVisible(true)
 		menu.SaveLoadMenu.SetButtons(ui.LoadMenuButtons)
-		menu.SaveMenu.Visible = false
+		//menu.SaveMenu.Visible = false
 	})
 	menu.SetSaveGameCallback(func() {
-		menu.SaveMenu.LoadFiles()
-		menu.SaveMenu.Visible = true
-		menu.SaveLoadMenu.SetVisible(false)
+		menu.SaveLoadMenu.SetFiles(ui.LoadSaveFiles())
+		menu.SaveLoadMenu.SetVisible(true)
+		menu.SaveLoadMenu.SetButtons(ui.SaveMenuButtons)
+		//menu.SaveMenu.LoadFiles()
+		//menu.SaveMenu.Visible = true
+		//menu.SaveLoadMenu.SetVisible(false)
+	})
+	ui.SetLoadHandler(func(name string) {
+		saveData, err := save.LoadGame(name)
+		if err != nil {
+			fmt.Println("Error loading game:", err)
+			return
+		}
+		// Копируем состояние загруженной игры в текущую игру
+		g.Player.LoadStats(saveData)
+		g.state = StatePlaying
 	})
 	ui.SetSaveGameHandler(func(name string) {
 		// формируем путь, например save/saves/<name>.json

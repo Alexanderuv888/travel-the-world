@@ -29,6 +29,7 @@ func NewMenu() *Menu {
 	saveMenu := NewSaveMenu(450, 100, int(wfloat/2), int(hfloat/3))
 	saveLoadMenu := NewSaveLoadMenu(450, 100, int(wfloat/2), int(hfloat/3))
 	saveLoadMenu.InitSaveLoadCallBackFunckions()
+	saveLoadMenu.initConfirmationDialogCallbacks()
 	m := &Menu{Buttons: []*Button{startGameBtn, loadGameBtn, saveGameBtn, exitBtn}, SaveMenu: *saveMenu, SaveLoadMenu: *saveLoadMenu}
 	m.SaveMenu.initCallBackFunckions()
 	return m

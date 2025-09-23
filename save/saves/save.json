@@ -1,8 +1,8 @@
 {
-  "Health": 14,
+  "Health": 2,
   "MaxHealth": 22,
   "HealthSpeedRecover": 1000,
-  "Stamina": 6,
+  "Stamina": 0,
   "MaxStamina": 11,
   "StaminaSpeedRecover": 1000,
   "damage": 7,
@@ -11,5 +11,5 @@
   "Speed": 1.5,
   "Level": 6,
   "MaxExp": 882,
-  "Exp": 446
+  "Exp": 536
 }

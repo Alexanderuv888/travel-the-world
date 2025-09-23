@@ -1,11 +1,13 @@
 package ui
 
 import (
+	"image/color"
 	"travel-the-world/ui/table"
 
 	text "travel-the-world/ui/text"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/vector"
 )
 
 type SaveLoadMenu struct {
@@ -52,15 +54,14 @@ func (m *SaveLoadMenu) SetFiles(files []SaveFile) {
 		dateCell.SetAlign(text.Right)
 		m.table.AddRow(table.NewRow(nameCell, dateCell))
 	}
+	m.table.UpdateScroll()
 }
 
 func (m *SaveLoadMenu) selectedFileName() string {
-
 	if m.selectedIndex() >= 0 && m.selectedIndex() < len(m.table.Rows) {
 		return m.table.Rows[m.selectedIndex()].Cells[0].Content
 	}
 	return ""
-
 }
 
 func (m *SaveLoadMenu) selectedIndex() int {
@@ -88,6 +89,27 @@ func (m *SaveLoadMenu) Draw(screen *ebiten.Image) {
 		return
 	}
 	m.table.Draw(screen)
-
 	m.buttonsBar.Draw(screen)
+	if m.ShowNewSaveDialog {
+		clr := color.RGBA{50, 50, 50, 255} // обычная строка
+		clr1 := color.RGBA{30, 30, 30, 240}
+		vector.DrawFilledRect(screen, float32(m.X+m.Width/2-150), float32(m.Y+m.Height/2-60), 300, 120, clr1, false)
+
+		row1 := ebiten.NewImage(290, 12)
+		row1.Fill(clr1)
+		op1 := &ebiten.DrawImageOptions{}
+		op1.GeoM.Translate(float64(m.X+m.Width/2-150+5), float64(m.Y+m.Height/2-60+20))
+		text.DrawText(row1, "Enter save name:", color.White, 10, 5, text.Right)
+		screen.DrawImage(row1, op1)
+
+		row2 := ebiten.NewImage(290, 32)
+		row2.Fill(clr)
+		op2 := &ebiten.DrawImageOptions{}
+		op2.GeoM.Translate(float64(m.X+m.Width/2-150+5), float64(m.Y+m.Height/2-60+40))
+		text.DrawText(row2, m.newSaveName, color.RGBA{200, 200, 200, 255}, 20, 5, text.Right)
+		screen.DrawImage(row2, op2)
+
+		//m.btnOk.Draw(screen)
+		//m.btnCancel.Draw(screen)
+	}
 }

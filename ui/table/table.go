@@ -78,7 +78,7 @@ func (t *Table) Update() {
 	if !t.visible {
 		return
 	}
-	t.updateScroll()
+	t.UpdateScroll()
 	for i := t.minVisibleIndex; i < t.maxVisibleIndex; i++ {
 		if t.Rows[i].HoveredWith(ebiten.CursorPosition()) && inpututil.IsMouseButtonJustPressed(ebiten.MouseButton0) {
 			t.ResetRowIndex()
@@ -106,8 +106,8 @@ func (t *Table) Draw(dst *ebiten.Image) {
 	t.drawScroll(dst)
 }
 
-func (t *Table) updateScroll() {
-	if t.maxVisibleRows > len(t.Rows) {
+func (t *Table) UpdateScroll() {
+	if t.maxVisibleIndex > len(t.Rows) || t.minVisibleIndex < 0 {
 		t.minVisibleIndex = 0
 		t.maxVisibleIndex = len(t.Rows)
 		return
@@ -156,13 +156,14 @@ func (t *Table) updateScroll() {
 	if t.maxVisibleIndex > len(t.Rows) {
 		t.maxVisibleIndex = len(t.Rows)
 	}
-	if t.minVisibleIndex > len(t.Rows)-t.maxVisibleRows {
-		t.minVisibleIndex = len(t.Rows) - t.maxVisibleRows
+	if len(t.Rows) > t.maxVisibleRows {
+		if t.minVisibleIndex > len(t.Rows)-t.maxVisibleRows {
+			t.minVisibleIndex = len(t.Rows) - t.maxVisibleRows
+		}
+		if t.maxVisibleIndex < t.minVisibleIndex+t.maxVisibleRows {
+			t.maxVisibleIndex = t.minVisibleIndex + t.maxVisibleRows
+		}
 	}
-	if t.maxVisibleIndex < t.minVisibleIndex+t.maxVisibleRows {
-		t.maxVisibleIndex = t.minVisibleIndex + t.maxVisibleRows
-	}
-
 }
 
 func (t *Table) hoverScroll(x, y int) bool {

@@ -78,13 +78,15 @@ func (m *SaveLoadMenu) InitSaveLoadCallBackFunckions() {
 	*onOverwrite = func() {
 		if m.selectedIndex() >= 0 && SaveGameHandler != nil {
 			SaveGameHandler(m.selectedFileName())
+			m.SetFiles(LoadSaveFiles())
 		}
 	}
 	*onLoad = func() {
 		if m.selectedIndex() >= 0 && LoadGameHandler != nil {
-			LoadGameHandler(m.selectedFileName())
-			m.visible = false
-			m.table.SetVisible(false)
+			name := m.selectedFileName()
+			path := filepath.Join("save", "saves", name+filepath.Ext(name+".json"))
+			LoadGameHandler(path)
+			m.SetVisible(false)
 		}
 	}
 	*onDelete = func() {
@@ -115,7 +117,7 @@ func (m *SaveLoadMenu) InitSaveLoadCallBackFunckions() {
 	}
 }
 
-func (m *SaveMenu) initConfirmationDialogCallbacks() {
+func (m *SaveLoadMenu) initConfirmationDialogCallbacks() {
 	*onOkBtn = func() {
 		if m.newSaveName != "" {
 			if SaveGameHandler != nil {

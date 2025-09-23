@@ -18,6 +18,28 @@ const (
 	Right
 )
 
+func DrawTextWithCoordinates(dst *ebiten.Image, x, y int, str string, clr color.Color, fontSize float64) {
+	src, err := text.NewGoTextFaceSource(bytes.NewReader(goregular.TTF))
+	if err != nil {
+		log.Fatal("Error during creating font. ", err)
+	}
+	face := text.GoTextFace{
+		Source: src,
+		Size:   fontSize, // размер шрифта
+	}
+
+	op := &text.DrawOptions{}
+	op.GeoM.Translate(float64(x), float64(y))
+	op.ColorScale.ScaleWithColor(clr)
+
+	text.Draw(
+		dst,   // *ebiten.Image – бэкграунд, на который рисуем
+		str,   // сам текст
+		&face, // интерфейс Face, описывающий шрифт
+		op,    // опции рисования, например центровка
+	)
+}
+
 func DrawText(dst *ebiten.Image, str string, clr color.Color, fontSize, offset float64, a Alignment) {
 	src, err := text.NewGoTextFaceSource(bytes.NewReader(goregular.TTF))
 	if err != nil {
@@ -49,7 +71,7 @@ func DrawText(dst *ebiten.Image, str string, clr color.Color, fontSize, offset f
 	op.ColorScale.ScaleWithColor(clr)
 
 	text.Draw(
-		dst,   // *ebiten.Image – изображение кнопки
+		dst,   // *ebiten.Image – бэкграунд, на который рисуем
 		str,   // сам текст
 		&face, // интерфейс Face, описывающий шрифт
 		op,    // опции рисования, например центровка
