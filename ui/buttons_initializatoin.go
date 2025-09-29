@@ -60,11 +60,23 @@ func initButtons() {
 // обработчик сохранения - его нужно зарегистрировать снаружи (game.SaveProgress)
 var SaveGameHandler func(filename string)
 
+var BtnOkHandler func()
+
+var NewSaveDlgVisibleHandler func(visible bool)
+
 var LoadGameHandler func(filename string)
 
 // Экспортируем регистратор обработчика сохранения
 func SetSaveGameHandler(cb func(filename string)) {
 	SaveGameHandler = cb
+}
+
+func SetBtnOkHandler(cb func()) {
+	BtnOkHandler = cb
+}
+
+func SetNewSaveDlgVisibleHandler(cb func(visible bool)) {
+	NewSaveDlgVisibleHandler = cb
 }
 
 func SetLoadHandler(cb func(filename string)) {
@@ -73,12 +85,15 @@ func SetLoadHandler(cb func(filename string)) {
 
 func (m *SaveLoadMenu) InitSaveLoadCallBackFunckions() {
 	*onNewSave = func() {
-		m.ShowNewSaveDialog = true
+		if NewSaveDlgVisibleHandler != nil {
+			NewSaveDlgVisibleHandler(true)
+		}
 	}
 	*onOverwrite = func() {
 		if m.selectedIndex() >= 0 && SaveGameHandler != nil {
 			SaveGameHandler(m.selectedFileName())
 			m.SetFiles(LoadSaveFiles())
+			m.SetVisible(false)
 		}
 	}
 	*onLoad = func() {
@@ -111,7 +126,7 @@ func (m *SaveLoadMenu) InitSaveLoadCallBackFunckions() {
 	*onClose = func() {
 		m.visible = false
 		m.SetVisible(false)
-		m.ShowNewSaveDialog = false
+		m.showNewSaveDialog = false
 		m.newSaveName = ""
 		m.resetIndex()
 	}
@@ -119,16 +134,13 @@ func (m *SaveLoadMenu) InitSaveLoadCallBackFunckions() {
 
 func (m *SaveLoadMenu) initConfirmationDialogCallbacks() {
 	*onOkBtn = func() {
-		if m.newSaveName != "" {
-			if SaveGameHandler != nil {
-				SaveGameHandler(m.newSaveName)
-			}
-			m.ShowNewSaveDialog = false
-			m.newSaveName = ""
+		if BtnOkHandler != nil {
+			BtnOkHandler()
 		}
 	}
 	*onCancelBtn = func() {
-		m.ShowNewSaveDialog = false
-		m.newSaveName = ""
+		if NewSaveDlgVisibleHandler != nil {
+			NewSaveDlgVisibleHandler(false)
+		}
 	}
 }

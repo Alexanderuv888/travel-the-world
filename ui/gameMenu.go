@@ -5,10 +5,7 @@ import (
 )
 
 type Menu struct {
-	Buttons []*Button
-	//Sfll    *SaveFilesListLayout
-	//SavesTable *Table
-	SaveMenu     SaveMenu
+	Buttons      []*Button
 	SaveLoadMenu SaveLoadMenu
 }
 
@@ -26,12 +23,11 @@ func NewMenu() *Menu {
 	loadGameBtn := NewButton(100, 220, 200, 40, "Load game", onLoadGame)
 	exitBtn := NewButton(100, 280, 200, 40, "Quit", onExit)
 
-	saveMenu := NewSaveMenu(450, 100, int(wfloat/2), int(hfloat/3))
 	saveLoadMenu := NewSaveLoadMenu(450, 100, int(wfloat/2), int(hfloat/3))
 	saveLoadMenu.InitSaveLoadCallBackFunckions()
 	saveLoadMenu.initConfirmationDialogCallbacks()
-	m := &Menu{Buttons: []*Button{startGameBtn, loadGameBtn, saveGameBtn, exitBtn}, SaveMenu: *saveMenu, SaveLoadMenu: *saveLoadMenu}
-	m.SaveMenu.initCallBackFunckions()
+	m := &Menu{Buttons: []*Button{startGameBtn, loadGameBtn, saveGameBtn, exitBtn}, SaveLoadMenu: *saveLoadMenu}
+
 	return m
 }
 
@@ -63,7 +59,6 @@ func (m *Menu) Update() {
 		b.isHovered(ebiten.CursorPosition())
 		b.Update()
 	}
-	m.SaveMenu.Update()
 	m.SaveLoadMenu.Update()
 }
 
@@ -71,6 +66,5 @@ func (m *Menu) Draw(screen *ebiten.Image) {
 	for _, b := range m.Buttons {
 		b.Draw(screen)
 	}
-	m.SaveMenu.Draw(screen)
 	m.SaveLoadMenu.Draw(screen)
 }

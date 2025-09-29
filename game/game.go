@@ -99,13 +99,14 @@ func NewGame() (*Game, error) {
 		g.state = StatePlaying
 	})
 	ui.SetSaveGameHandler(func(name string) {
-		// формируем путь, например save/saves/<name>.json
 		path := "save/saves/" + name
-		// если хотите добавлять расширение:
-		// if !strings.HasSuffix(path, ".json") { path += ".json" }
 		g.SaveProgress(path)
-		// обновить список файлов в меню, если меню открыто:
-		menu.SaveMenu.LoadFiles()
+	})
+	ui.SetBtnOkHandler(func() {
+		g.Menu.SaveLoadMenu.SaveFile()
+	})
+	ui.SetNewSaveDlgVisibleHandler(func(visible bool) {
+		g.Menu.SaveLoadMenu.SetVisibleNewSaveDilog(visible)
 	})
 	return g, nil
 }
